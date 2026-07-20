@@ -1,0 +1,68 @@
+name: website-prod
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    # Not published to the host - only the web service needs to reach it,
+    # over the compose-internal network.
+
+  web:
+    build:
+      context: .
+      target: runtime
+    restart: unless-stopped
+    environment:
+      DJANGO_SETTINGS_MODULE: website.settings.production
+      DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+      SECRET_KEY: ${SECRET_KEY}
+      ALLOWED_HOSTS: ${ALLOWED_HOSTS}
+      CSRF_TRUSTED_ORIGINS: ${CSRF_TRUSTED_ORIGINS}
+      WAGTAILADMIN_BASE_URL: ${WAGTAILADMIN_BASE_URL}
+      EMAIL_URL: ${EMAIL_URL}
+      DEFAULT_FROM_EMAIL: ${DEFAULT_FROM_EMAIL}
+    volumes:
+      # Named volume, not a bind mount: uploaded images/documents persist
+      # across `docker compose up --build` and container recreation, live
+      # entirely on this VM (no S3/object storage involved).
+      - media_data:/app/media
+    depends_on:
+      db:
+        condition: service_healthy
+    expose:
+      - "8000"
+    # No ports: published here - only reachable from other containers on
+    # this compose network (i.e. Caddy). Do not add a `ports:` mapping
+    # unless you're intentionally bypassing the reverse proxy.
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      DOMAIN: ${DOMAIN}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - web
+
+volumes:
+  postgres_data:
+  media_data:
+  caddy_data:
+  caddy_config:

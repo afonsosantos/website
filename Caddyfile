@@ -1,0 +1,9 @@
+{$DOMAIN} {
+	# Caddy handles TLS automatically (Let's Encrypt) as long as DOMAIN
+	# resolves to this VM's public IP and ports 80/443 are reachable.
+	reverse_proxy web:8000
+	encode gzip
+
+	# Static/media are served by WhiteNoise/gunicorn in the web container -
+	# no extra config needed here, just proxy everything through.
+}

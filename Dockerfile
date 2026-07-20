@@ -51,8 +51,10 @@ RUN apt-get update --yes --quiet && apt-get install --yes --quiet --no-install-r
     libwebp7 \
  && rm -rf /var/lib/apt/lists/*
 
-# Add user that will be used in the container.
-RUN useradd wagtail
+# Add user that will be used in the container. `--create-home` gives it a
+# writable $HOME - gunicorn 25+ wants one for its control socket, and
+# without it logs a (harmless but noisy) permission error on every boot.
+RUN useradd --create-home wagtail
 
 # Port used by this container to serve HTTP.
 EXPOSE 8000
@@ -79,6 +81,12 @@ RUN chown wagtail:wagtail /app
 
 # Copy the source code of the project into the container.
 COPY --chown=wagtail:wagtail . .
+
+# Pre-create /app/media with the right ownership. When docker-compose mounts
+# an empty named volume here, Docker seeds it from the image's existing
+# directory - including ownership - so uploads stay writable by "wagtail"
+# without a separate entrypoint/chown step.
+RUN mkdir -p /app/media && chown wagtail:wagtail /app/media
 
 # Use user "wagtail" to run the build commands below and the server itself.
 USER wagtail

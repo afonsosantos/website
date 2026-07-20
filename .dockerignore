@@ -6,9 +6,14 @@
 # VCS / env / local tooling
 .git/
 .env
+.env.prod
 .venv/
 .idea/
 .claude/
+
+# Compose/proxy files aren't needed inside the image itself.
+docker-compose*.yml
+Caddyfile
 
 # Python and others
 __pycache__

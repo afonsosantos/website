@@ -41,4 +41,5 @@ wheels/
 
 # Environment / secrets
 .env
+.env.prod
 website/settings/local.py
