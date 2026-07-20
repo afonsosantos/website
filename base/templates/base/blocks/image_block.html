@@ -1,0 +1,7 @@
+{% load wagtailimages_tags %}
+<figure class="stream-image">
+    {% image value.image width-800 alt=value.alt_text %}
+    {% if value.caption %}
+        <figcaption>{{ value.caption }}</figcaption>
+    {% endif %}
+</figure>

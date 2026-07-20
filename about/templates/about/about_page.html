@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% load wagtailcore_tags wagtailimages_tags %}
+
+{% block body_class %}template-about{% endblock %}
+
+{% block content %}
+    <section class="container container--narrow">
+        <h1>{{ page.title }}</h1>
+        {% if page.profile_image %}
+            {% image page.profile_image fill-320x320 class="hero__image" alt=page.profile_image.title %}
+        {% endif %}
+        {% if page.intro %}
+            <div class="richtext">{{ page.intro|richtext }}</div>
+        {% endif %}
+        {% if page.resume_pdf %}
+            <p>
+                <a class="button" href="{{ page.resume_pdf.url }}">
+                    Download resume (PDF{% if page.resume_pdf.file_size %}, {{ page.resume_pdf.file_size|filesizeformat }}{% endif %})
+                </a>
+            </p>
+        {% endif %}
+    </section>
+
+    {% with experiences=page.work_experiences.all %}
+        {% if experiences %}
+            <section class="container container--narrow">
+                <h2>Experience</h2>
+                {% for entry in experiences %}
+                    <article class="cv-entry">
+                        <p class="cv-entry__dates">
+                            {{ entry.start_date|date:"M Y" }} &ndash;
+                            {% if entry.end_date %}{{ entry.end_date|date:"M Y" }}{% else %}Present{% endif %}
+                        </p>
+                        <div>
+                            <h3 class="cv-entry__title">{{ entry.job_title }}</h3>
+                            <p class="cv-entry__org">
+                                {% if entry.organization_url %}
+                                    <a href="{{ entry.organization_url }}">{{ entry.organization }}</a>
+                                {% else %}
+                                    {{ entry.organization }}
+                                {% endif %}
+                                {% if entry.location %} &middot; {{ entry.location }}{% endif %}
+                            </p>
+                            {% if entry.description %}
+                                <div class="richtext">{{ entry.description|richtext }}</div>
+                            {% endif %}
+                        </div>
+                    </article>
+                {% endfor %}
+            </section>
+        {% endif %}
+    {% endwith %}
+
+    {% with education=page.education_entries.all %}
+        {% if education %}
+            <section class="container container--narrow">
+                <h2>Education</h2>
+                {% for entry in education %}
+                    <article class="cv-entry">
+                        <p class="cv-entry__dates">
+                            {{ entry.start_date|date:"Y" }} &ndash;
+                            {% if entry.end_date %}{{ entry.end_date|date:"Y" }}{% else %}Present{% endif %}
+                        </p>
+                        <div>
+                            <h3 class="cv-entry__title">{{ entry.qualification }}</h3>
+                            <p class="cv-entry__org">
+                                {% if entry.institution_url %}
+                                    <a href="{{ entry.institution_url }}">{{ entry.institution }}</a>
+                                {% else %}
+                                    {{ entry.institution }}
+                                {% endif %}
+                            </p>
+                            {% if entry.description %}
+                                <div class="richtext">{{ entry.description|richtext }}</div>
+                            {% endif %}
+                        </div>
+                    </article>
+                {% endfor %}
+            </section>
+        {% endif %}
+    {% endwith %}
+
+    {% if page.get_grouped_skills %}
+        <section class="container container--narrow">
+            <h2>Skills</h2>
+            <div class="stack">
+                {% for category, skills in page.get_grouped_skills.items %}
+                    <div class="skill-group">
+                        <h3>{{ skills.0.get_category_display_name }}</h3>
+                        <ul class="tag-list">
+                            {% for skill in skills %}
+                                <li class="tag">{{ skill.name }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endfor %}
+            </div>
+        </section>
+    {% endif %}
+{% endblock content %}

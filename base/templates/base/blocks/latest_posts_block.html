@@ -1,0 +1,27 @@
+{% load wagtailcore_tags wagtailimages_tags %}
+<section class="latest-posts">
+    <div class="container">
+        <div class="section-heading">
+            <h2>{{ value.heading }}</h2>
+            {% if posts %}
+                <a href="{% pageurl posts.0.get_parent %}" class="button button--outline">View all posts</a>
+            {% endif %}
+        </div>
+        <div class="card-grid">
+            {% for post in posts %}
+                <article class="card">
+                    {% if post.cover_image %}
+                        {% image post.cover_image fill-640x360 class="card__image" alt="" %}
+                    {% endif %}
+                    <div class="card__body">
+                        <p class="card__meta">{{ post.date|date:"j F Y" }}</p>
+                        <h3 class="card__title"><a href="{% pageurl post %}">{{ post.title }}</a></h3>
+                        <p class="card__summary">{{ post.intro }}</p>
+                    </div>
+                </article>
+            {% empty %}
+                <p>No posts yet.</p>
+            {% endfor %}
+        </div>
+    </div>
+</section>

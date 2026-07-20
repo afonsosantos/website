@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% load wagtailcore_tags %}
+
+{% block body_class %}template-contact-landing{% endblock %}
+
+{% block content %}
+    <section class="container container--narrow">
+        <h1>Thank you</h1>
+        {% if page.thank_you_text %}
+            <div class="richtext">{{ page.thank_you_text|richtext }}</div>
+        {% else %}
+            <p>Thanks for your message — I'll get back to you soon.</p>
+        {% endif %}
+        <p><a href="/">&larr; Back to home</a></p>
+    </section>
+{% endblock content %}

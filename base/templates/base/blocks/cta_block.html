@@ -1,0 +1,7 @@
+<section class="cta">
+    <div class="container container--narrow stack">
+        <h2>{{ value.heading }}</h2>
+        {% if value.text %}<p>{{ value.text }}</p>{% endif %}
+        {% include "base/includes/button.html" with button=value.button %}
+    </div>
+</section>

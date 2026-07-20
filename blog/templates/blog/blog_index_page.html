@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% load wagtailcore_tags wagtailimages_tags %}
+
+{% block body_class %}template-blogindex{% endblock %}
+
+{% block content %}
+    <section class="container container--narrow">
+        <h1>{{ page.title }}</h1>
+        {% if page.intro %}<p class="hero__lede">{{ page.intro }}</p>{% endif %}
+    </section>
+
+    {% if all_categories %}
+        <section class="container">
+            <ul class="tag-list" aria-label="Filter by category">
+                <li>
+                    <a class="tag" href="{% pageurl page %}"{% if not current_category %} aria-current="true"{% endif %}>All</a>
+                </li>
+                {% for category in all_categories %}
+                    <li>
+                        <a class="tag" href="?category={{ category.slug }}"{% if current_category == category.slug %} aria-current="true"{% endif %}>{{ category.name }}</a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </section>
+    {% endif %}
+
+    <section class="container">
+        <div class="card-grid">
+            {% for post in posts %}
+                <article class="card">
+                    {% if post.cover_image %}
+                        {% image post.cover_image fill-640x360 class="card__image" alt="" %}
+                    {% endif %}
+                    <div class="card__body">
+                        <p class="card__meta">{{ post.date|date:"j F Y" }}</p>
+                        <h2 class="card__title"><a href="{% pageurl post %}">{{ post.title }}</a></h2>
+                        <p class="card__summary">{{ post.intro }}</p>
+                        {% with tags=post.tags.all %}
+                            {% if tags %}
+                                <ul class="tag-list">
+                                    {% for tag in tags %}
+                                        <li class="tag">{{ tag.name }}</li>
+                                    {% endfor %}
+                                </ul>
+                            {% endif %}
+                        {% endwith %}
+                    </div>
+                </article>
+            {% empty %}
+                <p>No posts published yet.</p>
+            {% endfor %}
+        </div>
+
+        {% if posts.paginator.num_pages > 1 %}
+            <nav aria-label="Post pages">
+                <ul class="pagination">
+                    {% if posts.has_previous %}
+                        <li><a href="?page={{ posts.previous_page_number }}{% if current_tag %}&amp;tag={{ current_tag }}{% endif %}{% if current_category %}&amp;category={{ current_category }}{% endif %}" aria-label="Previous page">&laquo;</a></li>
+                    {% endif %}
+                    {% for page_num in posts.paginator.page_range %}
+                        <li>
+                            <a href="?page={{ page_num }}{% if current_tag %}&amp;tag={{ current_tag }}{% endif %}{% if current_category %}&amp;category={{ current_category }}{% endif %}"
+                               {% if page_num == posts.number %}aria-current="page"{% endif %}>{{ page_num }}</a>
+                        </li>
+                    {% endfor %}
+                    {% if posts.has_next %}
+                        <li><a href="?page={{ posts.next_page_number }}{% if current_tag %}&amp;tag={{ current_tag }}{% endif %}{% if current_category %}&amp;category={{ current_category }}{% endif %}" aria-label="Next page">&raquo;</a></li>
+                    {% endif %}
+                </ul>
+            </nav>
+        {% endif %}
+    </section>
+{% endblock content %}

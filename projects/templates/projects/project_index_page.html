@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% load wagtailcore_tags wagtailimages_tags %}
+
+{% block body_class %}template-projectindex{% endblock %}
+
+{% block content %}
+    <section class="container container--narrow">
+        <h1>{{ page.title }}</h1>
+        {% if page.intro %}<p class="hero__lede">{{ page.intro }}</p>{% endif %}
+    </section>
+
+    <section class="container">
+        <div class="card-grid">
+            {% for project in projects %}
+                <article class="card">
+                    {% if project.cover_image %}
+                        {% image project.cover_image fill-640x360 class="card__image" alt="" %}
+                    {% endif %}
+                    <div class="card__body">
+                        <h2 class="card__title"><a href="{% pageurl project %}">{{ project.title }}</a></h2>
+                        <p class="card__summary">{{ project.summary }}</p>
+                        {% with technologies=project.technologies.all %}
+                            {% if technologies %}
+                                <ul class="tag-list">
+                                    {% for tech in technologies %}
+                                        <li class="tag">{{ tech.name }}</li>
+                                    {% endfor %}
+                                </ul>
+                            {% endif %}
+                        {% endwith %}
+                    </div>
+                </article>
+            {% empty %}
+                <p>No projects published yet.</p>
+            {% endfor %}
+        </div>
+    </section>
+{% endblock content %}

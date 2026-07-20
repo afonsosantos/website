@@ -1,6 +1,4 @@
-{% load static wagtailcore_tags wagtailuserbar %}
-
-<!DOCTYPE html>
+{% load static wagtailcore_tags wagtailimages_tags wagtailuserbar navigation_tags %}<!DOCTYPE html>
 <html lang="en">
     <head>
         <meta charset="utf-8" />
@@ -18,13 +16,28 @@
         {% endif %}
         <meta name="viewport" content="width=device-width, initial-scale=1" />
 
+        {# Open Graph / Twitter Card #}
+        <meta property="og:type" content="{% block og_type %}website{% endblock %}" />
+        <meta property="og:title" content="{% if page.seo_title %}{{ page.seo_title }}{% else %}{{ page.title }}{% endif %}" />
+        {% if page.search_description %}<meta property="og:description" content="{{ page.search_description }}" />{% endif %}
+        <meta property="og:url" content="{{ request.build_absolute_uri }}" />
+        {% block og_image %}
+        {% if settings.base.SiteSettings.default_og_image %}
+            {% image settings.base.SiteSettings.default_og_image width-1200 as og_image %}
+            <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ og_image.url }}" />
+        {% endif %}
+        {% endblock %}
+        <meta name="twitter:card" content="summary_large_image" />
+
         {# Force all links in the live preview panel to be opened in a new tab #}
         {% if request.in_preview_panel %}
         <base target="_blank">
         {% endif %}
 
         {# Global stylesheets #}
-        <link rel="stylesheet" type="text/css" href="{% static 'css/website.css' %}">
+        <link rel="stylesheet" type="text/css" href="{% static 'css/tokens.css' %}">
+        <link rel="stylesheet" type="text/css" href="{% static 'css/layout.css' %}">
+        <link rel="stylesheet" type="text/css" href="{% static 'css/components.css' %}">
 
         {% block extra_css %}
         {# Override this in templates to add extra stylesheets #}
@@ -34,10 +47,42 @@
     <body class="{% block body_class %}{% endblock %}">
         {% wagtailuserbar %}
 
-        {% block content %}{% endblock %}
+        <a class="skip-link" href="#main-content">Skip to main content</a>
 
-        {# Global javascript #}
-        <script type="text/javascript" src="{% static 'js/website.js' %}"></script>
+        <header class="site-header">
+            <div class="site-header__inner">
+                {% wagtail_site as current_site %}
+                <a class="site-header__brand" href="/">{% firstof current_site.site_name "Home" %}</a>
+                {% primary_nav %}
+            </div>
+        </header>
+
+        <main id="main-content">
+            {% block content %}{% endblock %}
+        </main>
+
+        <footer class="site-footer">
+            <div class="site-footer__inner">
+                <div class="richtext">
+                    {% if settings.base.SiteSettings.footer_text %}
+                        {{ settings.base.SiteSettings.footer_text }}
+                    {% else %}
+                        <p>&copy; {% now "Y" %} {{ current_site.site_name }}</p>
+                    {% endif %}
+                </div>
+                <ul class="social-links">
+                    {% if settings.base.SiteSettings.github_url %}
+                        <li><a href="{{ settings.base.SiteSettings.github_url }}">GitHub</a></li>
+                    {% endif %}
+                    {% if settings.base.SiteSettings.linkedin_url %}
+                        <li><a href="{{ settings.base.SiteSettings.linkedin_url }}">LinkedIn</a></li>
+                    {% endif %}
+                    {% if settings.base.SiteSettings.mastodon_url %}
+                        <li><a href="{{ settings.base.SiteSettings.mastodon_url }}" rel="me">Mastodon</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+        </footer>
 
         {% block extra_js %}
         {# Override this in templates to add extra javascript #}

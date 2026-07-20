@@ -3,6 +3,13 @@
 /static/
 *.sqlite3
 
+# VCS / env / local tooling
+.git/
+.env
+.venv/
+.idea/
+.claude/
+
 # Python and others
 __pycache__
 *.pyc

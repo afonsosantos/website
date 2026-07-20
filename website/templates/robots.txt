@@ -1,0 +1,6 @@
+User-agent: *
+Disallow: /admin/
+Disallow: /django-admin/
+Disallow: /documents/
+
+Sitemap: {{ request.scheme }}://{{ request.get_host }}{% url 'sitemap' %}

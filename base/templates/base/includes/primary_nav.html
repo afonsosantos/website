@@ -1,0 +1,14 @@
+{% load wagtailcore_tags %}
+<nav class="primary-nav" aria-label="Primary">
+    <ul>
+        {% for menu_page in menu_pages %}
+            {% pageurl menu_page as menu_url %}
+            <li>
+                <a href="{{ menu_url }}"{% if request.path == menu_url %} aria-current="page"{% endif %}>
+                    {{ menu_page.title }}
+                </a>
+            </li>
+        {% endfor %}
+        <li><a href="{% url 'search' %}">Search</a></li>
+    </ul>
+</nav>

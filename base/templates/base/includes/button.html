@@ -1,0 +1,6 @@
+{% load wagtailcore_tags %}
+{% if button.page %}
+    <a class="button{% if button_style %} {{ button_style }}{% endif %}" href="{% pageurl button.page %}">{{ button.text }}</a>
+{% elif button.external_url %}
+    <a class="button{% if button_style %} {{ button_style }}{% endif %}" href="{{ button.external_url }}">{{ button.text }}</a>
+{% endif %}

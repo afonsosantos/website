@@ -1,0 +1,7 @@
+{% load wagtailembeds_tags %}
+<figure class="stream-embed">
+    {% embed value.url %}
+    {% if value.caption %}
+        <figcaption>{{ value.caption }}</figcaption>
+    {% endif %}
+</figure>

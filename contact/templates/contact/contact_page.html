@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% load wagtailcore_tags %}
+
+{% block body_class %}template-contact{% endblock %}
+
+{% block content %}
+    <section class="container container--narrow">
+        <h1>{{ page.title }}</h1>
+        {% if page.intro %}
+            <div class="richtext">{{ page.intro|richtext }}</div>
+        {% endif %}
+
+        {% if form.non_field_errors %}
+            <div class="form-errors" role="alert">
+                {{ form.non_field_errors }}
+            </div>
+        {% endif %}
+
+        <form action="{% pageurl page %}" method="POST" novalidate>
+            {% csrf_token %}
+            {% for field in form %}
+                {% if field.name == "hp_website" %}
+                    <div class="form-honeypot" aria-hidden="true">
+                        {{ field.label_tag }}
+                        {{ field }}
+                    </div>
+                {% else %}
+                    <div class="form-field{% if field.field.required %} form-field--required{% endif %}">
+                        {{ field.label_tag }}
+                        {% if field.help_text %}<p id="{{ field.id_for_label }}-help">{{ field.help_text }}</p>{% endif %}
+                        {{ field }}
+                        {% if field.errors %}
+                            <div class="form-field__error" id="{{ field.id_for_label }}-error" role="alert">
+                                {% for error in field.errors %}{{ error }}{% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            {% endfor %}
+            <button type="submit" class="button">Send message</button>
+        </form>
+    </section>
+{% endblock content %}

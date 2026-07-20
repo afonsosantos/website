@@ -1,0 +1,26 @@
+{% load wagtailcore_tags wagtailimages_tags %}
+<section class="featured-projects">
+    <div class="container">
+        <div class="section-heading">
+            <h2>{{ value.heading }}</h2>
+            {% if projects %}
+                <a href="{% pageurl projects.0.get_parent %}" class="button button--outline">View all projects</a>
+            {% endif %}
+        </div>
+        <div class="card-grid">
+            {% for project in projects %}
+                <article class="card">
+                    {% if project.cover_image %}
+                        {% image project.cover_image fill-640x360 class="card__image" alt="" %}
+                    {% endif %}
+                    <div class="card__body">
+                        <h3 class="card__title"><a href="{% pageurl project %}">{{ project.title }}</a></h3>
+                        <p class="card__summary">{{ project.summary }}</p>
+                    </div>
+                </article>
+            {% empty %}
+                <p>No projects yet.</p>
+            {% endfor %}
+        </div>
+    </div>
+</section>
