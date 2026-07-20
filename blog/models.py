@@ -70,7 +70,11 @@ class BlogIndexPage(Page):
         context["posts"] = paginator.get_page(page_number)
         context["current_tag"] = tag
         context["current_category"] = category_slug
-        context["all_categories"] = BlogCategory.objects.all()
+        # Only categories actually used by a live post under this index -
+        # an empty category isn't a useful filter.
+        context["all_categories"] = BlogCategory.objects.filter(
+            blogpage__in=self.get_posts()
+        ).distinct()
         return context
 
 

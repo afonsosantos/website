@@ -5,52 +5,54 @@
 {% block og_type %}article{% endblock %}
 
 {% block content %}
-    <article class="container container--narrow">
-        <header class="stack">
-            <h1>{{ page.title }}</h1>
-            <p class="lede">{{ page.summary }}</p>
-            {% with technologies=page.technologies.all %}
-                {% if technologies %}
-                    <ul class="tag-list">
-                        {% for tech in technologies %}
-                            <li class="tag">{{ tech.name }}</li>
+    <section>
+        <article class="container container--narrow">
+            <header class="stack">
+                <h1>{{ page.title }}</h1>
+                <p class="lede">{{ page.summary }}</p>
+                {% with technologies=page.technologies.all %}
+                    {% if technologies %}
+                        <ul class="tag-list">
+                            {% for tech in technologies %}
+                                <li class="tag">{{ tech.name }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                {% endwith %}
+                {% if page.repo_url or page.live_url %}
+                    <div class="hero__actions">
+                        {% if page.live_url %}
+                            <a class="button" href="{{ page.live_url }}">View live</a>
+                        {% endif %}
+                        {% if page.repo_url %}
+                            <a class="button button--outline" href="{{ page.repo_url }}">View source</a>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            </header>
+
+            {% if page.cover_image %}
+                {% image page.cover_image width-1000 class="stream-image" alt="" %}
+            {% endif %}
+
+            <div class="stack">
+                {% for block in page.body %}
+                    {% include_block block %}
+                {% endfor %}
+            </div>
+
+            {% with gallery=page.gallery_images.all %}
+                {% if gallery %}
+                    <div class="card-grid">
+                        {% for item in gallery %}
+                            <figure class="stream-image">
+                                {% image item.image width-600 alt=item.alt_text %}
+                                {% if item.caption %}<figcaption>{{ item.caption }}</figcaption>{% endif %}
+                            </figure>
                         {% endfor %}
-                    </ul>
+                    </div>
                 {% endif %}
             {% endwith %}
-            {% if page.repo_url or page.live_url %}
-                <div class="hero__actions">
-                    {% if page.live_url %}
-                        <a class="button" href="{{ page.live_url }}">View live</a>
-                    {% endif %}
-                    {% if page.repo_url %}
-                        <a class="button button--outline" href="{{ page.repo_url }}">View source</a>
-                    {% endif %}
-                </div>
-            {% endif %}
-        </header>
-
-        {% if page.cover_image %}
-            {% image page.cover_image width-1000 class="stream-image" alt="" %}
-        {% endif %}
-
-        <div class="stack">
-            {% for block in page.body %}
-                {% include_block block %}
-            {% endfor %}
-        </div>
-
-        {% with gallery=page.gallery_images.all %}
-            {% if gallery %}
-                <div class="card-grid">
-                    {% for item in gallery %}
-                        <figure class="stream-image">
-                            {% image item.image width-600 alt=item.alt_text %}
-                            {% if item.caption %}<figcaption>{{ item.caption }}</figcaption>{% endif %}
-                        </figure>
-                    {% endfor %}
-                </div>
-            {% endif %}
-        {% endwith %}
-    </article>
+        </article>
+    </section>
 {% endblock content %}

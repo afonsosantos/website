@@ -5,31 +5,33 @@
 {% block og_type %}article{% endblock %}
 
 {% block content %}
-    <article class="container container--narrow">
-        <header class="stack">
-            <p class="lede">{{ page.date|date:"j F Y" }}</p>
-            <h1>{{ page.title }}</h1>
-            {% with tags=page.tags.all %}
-                {% if tags %}
-                    <ul class="tag-list">
-                        {% for tag in tags %}
-                            <li class="tag">{{ tag.name }}</li>
-                        {% endfor %}
-                    </ul>
-                {% endif %}
-            {% endwith %}
-        </header>
+    <section>
+        <article class="container container--narrow">
+            <header class="stack">
+                <p class="lede">{{ page.date|date:"j F Y" }}</p>
+                <h1>{{ page.title }}</h1>
+                {% with tags=page.tags.all %}
+                    {% if tags %}
+                        <ul class="tag-list">
+                            {% for tag in tags %}
+                                <li class="tag">{{ tag.name }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                {% endwith %}
+            </header>
 
-        {% if page.cover_image %}
-            {% image page.cover_image width-1000 class="stream-image" alt="" %}
-        {% endif %}
+            {% if page.cover_image %}
+                {% image page.cover_image width-1000 class="stream-image" alt="" %}
+            {% endif %}
 
-        <div class="stack">
-            {% for block in page.body %}
-                {% include_block block %}
-            {% endfor %}
-        </div>
+            <div class="stack">
+                {% for block in page.body %}
+                    {% include_block block %}
+                {% endfor %}
+            </div>
 
-        <p><a href="{% pageurl page.get_parent %}">&larr; Back to all posts</a></p>
-    </article>
+            <p><a href="{% pageurl page.get_parent %}">&larr; Back to all posts</a></p>
+        </article>
+    </section>
 {% endblock content %}
