@@ -8,13 +8,22 @@ html {
   color-scheme: light dark;
 }
 
+:root[data-theme="dark"] {
+  color-scheme: dark;
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+}
+
 body {
   margin: 0;
-  font-family: var(--font-sans);
+  font-family: var(--font-body);
   font-size: var(--step-0);
   line-height: var(--leading-normal);
   background: var(--color-bg);
   color: var(--color-text);
+  font-variant-numeric: tabular-nums;
 }
 
 img,
@@ -27,12 +36,15 @@ h1,
 h2,
 h3,
 h4 {
+  font-family: var(--font-display);
+  font-weight: 600;
   line-height: var(--leading-tight);
   text-wrap: balance;
 }
 
 h1 {
   font-size: var(--step-4);
+  font-weight: 700;
 }
 h2 {
   font-size: var(--step-3);
@@ -48,12 +60,27 @@ a {
   color: var(--color-accent);
 }
 
+@media (prefers-reduced-motion: no-preference) {
+  a,
+  .button,
+  .card,
+  .tag {
+    transition:
+      color 0.15s ease,
+      background-color 0.15s ease,
+      border-color 0.15s ease,
+      transform 0.15s ease,
+      box-shadow 0.15s ease;
+  }
+}
+
 /* Accessible focus states - never remove without a visible replacement. */
 a:focus-visible,
 button:focus-visible,
 input:focus-visible,
 textarea:focus-visible,
 select:focus-visible,
+summary:focus-visible,
 [tabindex]:focus-visible {
   outline: 3px solid var(--color-focus);
   outline-offset: 2px;
@@ -81,15 +108,23 @@ select:focus-visible,
   padding: var(--space-2) var(--space-3);
   border-radius: var(--radius);
   z-index: 100;
-  transition: top 0.15s ease;
+  font-family: var(--font-display);
+  font-weight: 600;
 }
 
 .skip-link:focus {
   top: var(--space-3);
 }
 
+/* Header / nav ------------------------------------------------------- */
+
 .site-header {
   border-bottom: var(--border-width) solid var(--color-border);
+  position: sticky;
+  top: 0;
+  background: color-mix(in srgb, var(--color-bg) 92%, transparent);
+  backdrop-filter: blur(8px);
+  z-index: 10;
 }
 
 .site-header__inner {
@@ -97,42 +132,138 @@ select:focus-visible,
   margin-inline: auto;
   padding: var(--space-3) var(--space-4);
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: var(--space-3);
 }
 
 .site-header__brand {
+  font-family: var(--font-display);
   font-weight: 700;
-  font-size: var(--step-1);
+  font-size: var(--step-0);
   text-decoration: none;
   color: var(--color-text);
+  white-space: nowrap;
 }
 
-.primary-nav ul {
+.site-header__brand::before {
+  content: "~/";
+  color: var(--color-accent);
+}
+
+.primary-nav {
+  position: relative;
+}
+
+/* Mobile nav uses the checkbox-toggle pattern (not <details>, whose
+   closed-state box collapses to 0x0 in every engine even when the child
+   list's display is forced open via CSS - the checkbox + sibling selector
+   approach below has no such quirk, and needs no JS either). */
+.nav-toggle-input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.nav-disclosure__toggle {
+  cursor: pointer;
   display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-4);
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius);
+  font-family: var(--font-display);
+  font-size: var(--step--1);
+  font-weight: 500;
+  user-select: none;
+}
+
+.nav-disclosure__toggle::before {
+  content: "";
+  width: 1em;
+  height: 1em;
+  flex-shrink: 0;
+  background-color: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M3 6h18M3 12h18M3 18h18'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M3 6h18M3 12h18M3 18h18'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+
+.nav-toggle-input:checked ~ .nav-disclosure__toggle::before {
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M6 6l12 12M18 6L6 18'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M6 6l12 12M18 6L6 18'/%3E%3C/svg%3E");
+}
+
+.nav-toggle-input:focus-visible ~ .nav-disclosure__toggle {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.nav-disclosure__list {
   list-style: none;
   margin: 0;
-  padding: 0;
+  padding: var(--space-2);
+  display: none;
+  flex-direction: column;
+  gap: var(--space-1);
+  position: absolute;
+  top: calc(100% + var(--space-2));
+  right: 0;
+  min-width: 12rem;
+  background: var(--color-bg);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-md);
 }
 
-.primary-nav a {
+.nav-toggle-input:checked ~ .nav-disclosure__list {
+  display: flex;
+}
+
+.nav-disclosure__list a {
+  display: block;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius);
   text-decoration: none;
   color: var(--color-text);
   font-weight: 500;
 }
 
-.primary-nav a[aria-current="page"] {
-  color: var(--color-accent);
-  text-decoration: underline;
-  text-underline-offset: 0.25em;
+.nav-disclosure__list a:hover {
+  background: var(--color-bg-subtle);
 }
 
-.primary-nav a:hover {
-  text-decoration: underline;
+.nav-disclosure__list a[aria-current="page"] {
+  color: var(--color-accent);
+}
+
+/* Wide viewports: nav is always a plain horizontal row, no disclosure. */
+@media (min-width: 48rem) {
+  .nav-disclosure__toggle {
+    display: none;
+  }
+
+  .nav-disclosure__list {
+    display: flex;
+    position: static;
+    flex-direction: row;
+    gap: var(--space-4);
+    padding: 0;
+    background: none;
+    border: none;
+    box-shadow: none;
+  }
+
+  .nav-disclosure__list a {
+    padding: 0;
+  }
+
+  .nav-disclosure__list a[aria-current="page"] {
+    text-decoration: underline;
+    text-underline-offset: 0.3em;
+  }
 }
 
 main {
@@ -163,6 +294,20 @@ section {
   padding-block: var(--space-6);
 }
 
+@media (max-width: 40rem) {
+  section {
+    padding-block: var(--space-5);
+  }
+}
+
+.section-divider {
+  border: none;
+  border-top: var(--border-width) solid var(--color-border);
+  margin: 0;
+}
+
+/* Footer --------------------------------------------------------------- */
+
 .site-footer {
   border-top: var(--border-width) solid var(--color-border);
   margin-top: var(--space-6);
@@ -178,19 +323,30 @@ section {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
+  align-items: center;
   gap: var(--space-3);
 }
 
 .social-links {
   display: flex;
-  gap: var(--space-3);
+  gap: var(--space-4);
   list-style: none;
   margin: 0;
   padding: 0;
+  font-family: var(--font-display);
 }
 
-@media (max-width: 40rem) {
-  .site-header__inner {
+.social-links a {
+  color: var(--color-text-muted);
+  text-decoration: none;
+}
+
+.social-links a:hover {
+  color: var(--color-accent);
+}
+
+@media (max-width: 30rem) {
+  .site-footer__inner {
     flex-direction: column;
     align-items: flex-start;
   }

@@ -1,6 +1,27 @@
+from django.utils.safestring import mark_safe
+from pygments import highlight
+from pygments.formatters import HtmlFormatter
+from pygments.lexers import get_lexer_by_name
+from pygments.util import ClassNotFound
 from wagtail import blocks
 from wagtail.embeds.blocks import EmbedBlock as WagtailEmbedBlock
 from wagtail.images.blocks import ImageChooserBlock
+
+CODE_LANGUAGE_CHOICES = [
+    ("python", "Python"),
+    ("javascript", "JavaScript"),
+    ("typescript", "TypeScript"),
+    ("php", "PHP"),
+    ("bash", "Bash / shell"),
+    ("yaml", "YAML"),
+    ("json", "JSON"),
+    ("html", "HTML"),
+    ("css", "CSS"),
+    ("sql", "SQL"),
+    ("go", "Go"),
+    ("docker", "Dockerfile"),
+    ("text", "Plain text"),
+]
 
 
 class ImageBlock(blocks.StructBlock):
@@ -69,6 +90,33 @@ class EmbedBlock(blocks.StructBlock):
         template = "base/blocks/embed_block.html"
 
 
+class CodeBlock(blocks.StructBlock):
+    """A syntax-highlighted code sample, rendered server-side with
+    Pygments - no client-side JS highlighter needed."""
+
+    filename = blocks.CharBlock(
+        required=False,
+        max_length=255,
+        help_text="Optional, e.g. 'settings.py'.",
+    )
+    language = blocks.ChoiceBlock(choices=CODE_LANGUAGE_CHOICES, default="python")
+    code = blocks.TextBlock()
+
+    class Meta:
+        icon = "code"
+        template = "base/blocks/code_block.html"
+
+    def get_context(self, value, parent_context=None):
+        context = super().get_context(value, parent_context=parent_context)
+        try:
+            lexer = get_lexer_by_name(value["language"])
+        except ClassNotFound:
+            lexer = get_lexer_by_name("text")
+        formatter = HtmlFormatter(cssclass="highlight", nowrap=False)
+        context["highlighted_code"] = mark_safe(highlight(value["code"], lexer, formatter))
+        return context
+
+
 class BodyStreamBlock(blocks.StreamBlock):
     """Reusable freeform body content, shared by blog posts and project
     pages."""
@@ -78,6 +126,7 @@ class BodyStreamBlock(blocks.StreamBlock):
     image = ImageBlock()
     quote = QuoteBlock()
     embed = EmbedBlock()
+    code = CodeBlock()
 
 
 class ButtonBlock(blocks.StructBlock):

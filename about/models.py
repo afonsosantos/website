@@ -31,6 +31,7 @@ class AboutPage(Page):
         FieldPanel("resume_pdf"),
         InlinePanel("work_experiences", label="Work experience"),
         InlinePanel("education_entries", label="Education"),
+        InlinePanel("certificates", label="Certificates"),
         InlinePanel("skills", label="Skills"),
     ]
 
@@ -122,6 +123,28 @@ class EducationEntry(Orderable):
 
     def __str__(self):
         return f"{self.qualification}, {self.institution}"
+
+
+class Certificate(Orderable):
+    page = ParentalKey(AboutPage, on_delete=models.CASCADE, related_name="certificates")
+    name = models.CharField(max_length=255)
+    issuer = models.CharField(max_length=255)
+    date_awarded = models.DateField()
+    url = models.URLField(blank=True, help_text="Optional link to the credential.")
+
+    panels = [
+        FieldPanel("name"),
+        FieldPanel("issuer"),
+        FieldPanel("date_awarded"),
+        FieldPanel("url"),
+    ]
+
+    class Meta(Orderable.Meta):
+        verbose_name = "Certificate"
+        verbose_name_plural = "Certificates"
+
+    def __str__(self):
+        return f"{self.name} ({self.issuer})"
 
 
 class Skill(Orderable):

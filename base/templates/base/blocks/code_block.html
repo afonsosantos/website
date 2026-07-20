@@ -1,0 +1,6 @@
+<figure class="code-block">
+    {% if value.filename %}
+        <figcaption class="code-block__filename">{{ value.filename }}</figcaption>
+    {% endif %}
+    <div class="code-block__body">{{ highlighted_code }}</div>
+</figure>

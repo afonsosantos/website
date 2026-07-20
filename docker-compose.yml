@@ -21,7 +21,7 @@ services:
   web:
     build:
       context: .
-      target: builder
+      target: dev
     command: python manage.py runserver 0.0.0.0:8000
     volumes:
       - .:/app

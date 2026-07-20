@@ -3,7 +3,7 @@
     <div class="container container--narrow">
         <h1 class="hero__title">{{ value.heading }}</h1>
         {% if value.subheading %}
-            <p class="hero__lede">{{ value.subheading }}</p>
+            <p class="lede">{{ value.subheading }}</p>
         {% endif %}
         {% if value.image %}
             {% image value.image width-1000 class="hero__image" alt=value.image_alt_text %}

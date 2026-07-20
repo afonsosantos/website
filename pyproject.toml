@@ -1,3 +1,27 @@
+[project]
+name = "website"
+version = "0.1.0"
+description = "Personal website - portfolio, CV, and blog, built on Wagtail."
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "django>=5.2,<5.3",
+    "wagtail>=7.4,<7.5",
+    "django-environ>=0.11,<1.0",
+    "psycopg[binary]>=3.1,<4.0",
+    "whitenoise>=6.7,<7.0",
+    "django-storages[s3]>=1.14,<2.0",
+    "gunicorn>=25.1,<26.0",
+    "pygments>=2.20.0",
+]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.6,<1.0",
+]
+
+[tool.uv]
+package = false
+
 [tool.ruff]
 line-length = 88
 target-version = "py312"

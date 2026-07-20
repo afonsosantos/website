@@ -4,34 +4,37 @@
 {% block body_class %}template-about{% endblock %}
 
 {% block content %}
-    <section class="container container--narrow">
-        <h1>{{ page.title }}</h1>
+    <section class="container container--narrow about-header">
         {% if page.profile_image %}
-            {% image page.profile_image fill-320x320 class="hero__image" alt=page.profile_image.title %}
+            {% image page.profile_image fill-320x320 class="about-header__image" alt=page.profile_image.title %}
         {% endif %}
-        {% if page.intro %}
-            <div class="richtext">{{ page.intro|richtext }}</div>
-        {% endif %}
-        {% if page.resume_pdf %}
-            <p>
-                <a class="button" href="{{ page.resume_pdf.url }}">
-                    Download resume (PDF{% if page.resume_pdf.file_size %}, {{ page.resume_pdf.file_size|filesizeformat }}{% endif %})
-                </a>
-            </p>
-        {% endif %}
+        <div>
+            <h1>{{ page.title }}</h1>
+            {% if page.intro %}
+                <div class="richtext">{{ page.intro|richtext }}</div>
+            {% endif %}
+            {% if page.resume_pdf %}
+                <p>
+                    <a class="button" href="{{ page.resume_pdf.url }}">
+                        Download resume (PDF{% if page.resume_pdf.file_size %}, {{ page.resume_pdf.file_size|filesizeformat }}{% endif %})
+                    </a>
+                </p>
+            {% endif %}
+        </div>
     </section>
 
     {% with experiences=page.work_experiences.all %}
         {% if experiences %}
             <section class="container container--narrow">
-                <h2>Experience</h2>
-                {% for entry in experiences %}
-                    <article class="cv-entry">
-                        <p class="cv-entry__dates">
-                            {{ entry.start_date|date:"M Y" }} &ndash;
-                            {% if entry.end_date %}{{ entry.end_date|date:"M Y" }}{% else %}Present{% endif %}
-                        </p>
-                        <div>
+                <p class="eyebrow">Experience</p>
+                <h2>Work history</h2>
+                <div class="cv-timeline">
+                    {% for entry in experiences %}
+                        <article class="cv-entry">
+                            <p class="cv-entry__dates">
+                                {{ entry.start_date|date:"M Y" }} &ndash;
+                                {% if entry.end_date %}{{ entry.end_date|date:"M Y" }}{% else %}Present{% endif %}
+                            </p>
                             <h3 class="cv-entry__title">{{ entry.job_title }}</h3>
                             <p class="cv-entry__org">
                                 {% if entry.organization_url %}
@@ -44,9 +47,9 @@
                             {% if entry.description %}
                                 <div class="richtext">{{ entry.description|richtext }}</div>
                             {% endif %}
-                        </div>
-                    </article>
-                {% endfor %}
+                        </article>
+                    {% endfor %}
+                </div>
             </section>
         {% endif %}
     {% endwith %}
@@ -54,14 +57,15 @@
     {% with education=page.education_entries.all %}
         {% if education %}
             <section class="container container--narrow">
-                <h2>Education</h2>
-                {% for entry in education %}
-                    <article class="cv-entry">
-                        <p class="cv-entry__dates">
-                            {{ entry.start_date|date:"Y" }} &ndash;
-                            {% if entry.end_date %}{{ entry.end_date|date:"Y" }}{% else %}Present{% endif %}
-                        </p>
-                        <div>
+                <p class="eyebrow">Education</p>
+                <h2>Academic background</h2>
+                <div class="cv-timeline">
+                    {% for entry in education %}
+                        <article class="cv-entry">
+                            <p class="cv-entry__dates">
+                                {{ entry.start_date|date:"Y" }} &ndash;
+                                {% if entry.end_date %}{{ entry.end_date|date:"Y" }}{% else %}Present{% endif %}
+                            </p>
                             <h3 class="cv-entry__title">{{ entry.qualification }}</h3>
                             <p class="cv-entry__org">
                                 {% if entry.institution_url %}
@@ -73,16 +77,39 @@
                             {% if entry.description %}
                                 <div class="richtext">{{ entry.description|richtext }}</div>
                             {% endif %}
-                        </div>
-                    </article>
-                {% endfor %}
+                        </article>
+                    {% endfor %}
+                </div>
+            </section>
+        {% endif %}
+    {% endwith %}
+
+    {% with certificates=page.certificates.all %}
+        {% if certificates %}
+            <section class="container container--narrow">
+                <p class="eyebrow">Certificates</p>
+                <h2>Certifications</h2>
+                <ul class="cert-list">
+                    {% for cert in certificates %}
+                        <li class="cert-item">
+                            <div>
+                                <p class="cert-item__name">
+                                    {% if cert.url %}<a href="{{ cert.url }}">{{ cert.name }}</a>{% else %}{{ cert.name }}{% endif %}
+                                </p>
+                                <p class="cert-item__issuer">{{ cert.issuer }}</p>
+                            </div>
+                            <p class="cert-item__date">{{ cert.date_awarded|date:"M Y" }}</p>
+                        </li>
+                    {% endfor %}
+                </ul>
             </section>
         {% endif %}
     {% endwith %}
 
     {% if page.get_grouped_skills %}
         <section class="container container--narrow">
-            <h2>Skills</h2>
+            <p class="eyebrow">Skills</p>
+            <h2>Toolbox</h2>
             <div class="stack">
                 {% for category, skills in page.get_grouped_skills.items %}
                     <div class="skill-group">

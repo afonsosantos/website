@@ -11,19 +11,31 @@ RUN apt-get update --yes --quiet && apt-get install --yes --quiet --no-install-r
     libjpeg62-turbo-dev \
     zlib1g-dev \
     libwebp-dev \
- && rm -rf /var/lib/apt/lists/* \
- && python -m venv /opt/venv
+ && rm -rf /var/lib/apt/lists/*
 
-ENV PATH="/opt/venv/bin:$PATH"
+# Pin uv itself for reproducible builds.
+COPY --from=ghcr.io/astral-sh/uv:0.9.17 /uv /usr/local/bin/uv
+
+ENV UV_PROJECT_ENVIRONMENT=/opt/venv \
+    UV_PYTHON_DOWNLOADS=never \
+    UV_LINK_MODE=copy \
+    PATH="/opt/venv/bin:$PATH"
 
 WORKDIR /app
 
-# Install the project requirements.
-COPY requirements.txt /
-RUN pip install -r /requirements.txt
+# Install dependencies from the lockfile only (no source yet), so this
+# layer is cached unless pyproject.toml/uv.lock change. Production deps only.
+COPY pyproject.toml uv.lock /app/
+RUN uv sync --frozen --no-install-project --no-dev
 
-# Install the application server.
-RUN pip install "gunicorn==25.1.0"
+
+# DEV STAGE
+# Adds the `dev` dependency group (ruff, etc.) on top of the builder stage.
+# docker-compose targets this stage directly for local development, and
+# bind-mounts the repo over /app at runtime.
+FROM builder AS dev
+
+RUN uv sync --frozen --no-install-project
 
 
 # RUNTIME STAGE

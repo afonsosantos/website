@@ -21,6 +21,20 @@ Mailhog (catches contact-form emails in dev): http://localhost:8025
 Code changes on the host are picked up live (the `web` service bind-mounts
 the repo and runs `manage.py runserver`).
 
+### Running without Docker
+
+Dependencies are managed with [uv](https://docs.astral.sh/uv/) via
+`pyproject.toml` / `uv.lock` (no `requirements.txt`).
+
+```bash
+uv sync                      # installs prod + dev deps into .venv
+uv run python manage.py migrate
+uv run python manage.py runserver
+```
+
+`uv add <package>` / `uv remove <package>` to change dependencies —
+commit the updated `uv.lock`.
+
 ## Tests and linting
 
 ```bash

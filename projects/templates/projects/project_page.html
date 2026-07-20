@@ -8,7 +8,7 @@
     <article class="container container--narrow">
         <header class="stack">
             <h1>{{ page.title }}</h1>
-            <p class="hero__lede">{{ page.summary }}</p>
+            <p class="lede">{{ page.summary }}</p>
             {% with technologies=page.technologies.all %}
                 {% if technologies %}
                     <ul class="tag-list">

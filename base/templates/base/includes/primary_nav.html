@@ -1,6 +1,10 @@
 {% load wagtailcore_tags %}
 <nav class="primary-nav" aria-label="Primary">
-    <ul>
+    <input type="checkbox" id="nav-toggle" class="nav-toggle-input" />
+    <label for="nav-toggle" class="nav-disclosure__toggle">
+        <span class="nav-disclosure__label">Menu</span>
+    </label>
+    <ul class="nav-disclosure__list">
         {% for menu_page in menu_pages %}
             {% pageurl menu_page as menu_url %}
             <li>
