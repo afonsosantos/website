@@ -31,6 +31,8 @@
                 <article class="card">
                     {% if post.cover_image %}
                         {% image post.cover_image fill-640x360 class="card__image" alt="" %}
+                    {% else %}
+                        <div class="card__image card__image--placeholder" aria-hidden="true"><span>{{ post.title|slice:":1" }}</span></div>
                     {% endif %}
                     <div class="card__body">
                         <p class="card__meta">{{ post.date|date:"j F Y" }}</p>

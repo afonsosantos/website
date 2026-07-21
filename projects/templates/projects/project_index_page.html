@@ -16,6 +16,8 @@
                 <article class="card">
                     {% if project.cover_image %}
                         {% image project.cover_image fill-640x360 class="card__image" alt="" %}
+                    {% else %}
+                        <div class="card__image card__image--placeholder" aria-hidden="true"><span>{{ project.title|slice:":1" }}</span></div>
                     {% endif %}
                     <div class="card__body">
                         <h2 class="card__title"><a href="{% pageurl project %}">{{ project.title }}</a></h2>
