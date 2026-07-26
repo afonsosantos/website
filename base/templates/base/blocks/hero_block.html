@@ -1,17 +1,22 @@
 {% load wagtailimages_tags %}
 <section class="hero">
-    <div class="container container--narrow">
-        <h1 class="hero__title">{{ value.heading }}</h1>
-        {% if value.subheading %}
-            <p class="lede">{{ value.subheading }}</p>
-        {% endif %}
-        {% if value.image %}
-            {% image value.image width-1000 class="hero__image" alt=value.image_alt_text %}
-        {% endif %}
-        {% if value.button %}
-            <div class="hero__actions">
-                {% include "base/includes/button.html" with button=value.button %}
+    <div class="container">
+        <p class="eyebrow">Full-stack developer &middot; infra &amp; DevOps</p>
+        <div class="hero__body">
+            <h1 class="hero__title">{{ value.heading }}</h1>
+            <div class="hero__meta">
+                {% if value.subheading %}
+                    <p class="lede">{{ value.subheading }}</p>
+                {% endif %}
+                {% if value.image %}
+                    {% image value.image width-1000 class="hero__image" alt=value.image_alt_text %}
+                {% endif %}
+                {% if value.button %}
+                    <div class="button-row">
+                        {% include "base/includes/button.html" with button=value.button %}
+                    </div>
+                {% endif %}
             </div>
-        {% endif %}
+        </div>
     </div>
 </section>

@@ -1,7 +1,59 @@
-/* Type: JetBrains Mono carries headings, labels, and meta (nav, dates,
-   tags, section eyebrows) - a deliberate nod to a backend/infra developer's
-   daily tool. Public Sans carries body copy for readability at length.
-   Both self-hosted (see /static/fonts) - no font CDN. */
+/* Type: Clash Display is the one characterful voice on the page - used
+   only for the wordmark, the hero statement, and section titles, never
+   for body text. General Sans (from the same foundry, drawn to pair with
+   Clash Display) carries everything you actually read. JetBrains Mono is
+   kept for exactly one job - code samples - because that's the one place
+   a monospace grid is actually correct, not a personality choice.
+   All self-hosted (see /static/fonts) - no font CDN. */
+@font-face {
+  font-family: "Clash Display";
+  src: url("../fonts/ClashDisplay-Medium.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Clash Display";
+  src: url("../fonts/ClashDisplay-Semibold.woff2") format("woff2");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Clash Display";
+  src: url("../fonts/ClashDisplay-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "General Sans";
+  src: url("../fonts/GeneralSans-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "General Sans";
+  src: url("../fonts/GeneralSans-Italic.woff2") format("woff2");
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: "General Sans";
+  src: url("../fonts/GeneralSans-Medium.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "General Sans";
+  src: url("../fonts/GeneralSans-Semibold.woff2") format("woff2");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
 @font-face {
   font-family: "JetBrains Mono";
   src: url("../fonts/JetBrainsMono-Regular.woff2") format("woff2");
@@ -30,49 +82,23 @@
   font-style: normal;
   font-display: swap;
 }
-@font-face {
-  font-family: "Public Sans";
-  src: url("../fonts/PublicSans-Regular.woff2") format("woff2");
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: "Public Sans";
-  src: url("../fonts/PublicSans-Medium.woff2") format("woff2");
-  font-weight: 500;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: "Public Sans";
-  src: url("../fonts/PublicSans-SemiBold.woff2") format("woff2");
-  font-weight: 600;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: "Public Sans";
-  src: url("../fonts/PublicSans-Bold.woff2") format("woff2");
-  font-weight: 700;
-  font-style: normal;
-  font-display: swap;
-}
 
 :root {
-  --font-display: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  --font-body: "Public Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  --font-display: "Clash Display", ui-sans-serif, system-ui, sans-serif;
+  --font-body: "General Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 
-  /* Fluid type scale - body copy stays comfortable, display sizes flex. */
+  /* Fluid type scale - step-5 exists for exactly one thing, the hero
+     statement, so it's allowed to be genuinely oversized. */
   --step--1: clamp(0.83rem, 0.8rem + 0.16vw, 0.9rem);
   --step-0: clamp(1rem, 0.96rem + 0.2vw, 1.1rem);
   --step-1: clamp(1.2rem, 1.1rem + 0.5vw, 1.45rem);
   --step-2: clamp(1.44rem, 1.28rem + 0.8vw, 1.9rem);
   --step-3: clamp(1.86rem, 1.6rem + 1.3vw, 2.6rem);
-  --step-4: clamp(2.4rem, 1.9rem + 2.2vw, 3.6rem);
+  --step-4: clamp(2.4rem, 1.9rem + 2.2vw, 3.4rem);
+  --step-5: clamp(3rem, 2.2rem + 4.5vw, 6rem);
 
-  --leading-tight: 1.15;
+  --leading-tight: 1.05;
   --leading-normal: 1.6;
 
   /* Spacing scale */
@@ -83,84 +109,72 @@
   --space-5: 2.5rem;
   --space-6: 4rem;
   --space-7: 6rem;
+  --space-8: 9rem;
 
   /* Layout */
-  --content-width: 42rem;
-  --wide-width: 72rem;
-  --radius: 0.375rem;
+  --content-width: 38rem;
+  --content-width-wide: 56rem;
+  --wide-width: 76rem;
+  --spine-width: 16rem;
   --border-width: 1px;
+  --radius: 0;
 
-  /* Color - "blueprint" palette: deep navy grounds evoke infrastructure
-     diagrams, amber accents evoke solder joints / PCB traces / dashboard
-     indicator lights (a nod to Kubernetes-and-hardware + EV rally racing). */
-  --color-ink: #10151d;
-  --color-paper: #f4f6f9;
-  --color-navy-mid: #1b2635;
-  --color-slate: #57677d;
-  --color-amber: #c9701c;
-  --color-amber-deep: #9c5714;
+  /* Color - "studio index" palette: a cool paper ground and a warm
+     near-black ink (the colour of carbon fibre, not of a dark-mode IDE),
+     with a single deliberate accent - a deep cobalt, the one saturated
+     colour on an otherwise monochrome page. */
+  --color-paper: #eef0ec;
+  --color-ink: #17160f;
+  --color-graphite: #131210;
 
   --color-bg: var(--color-paper);
-  --color-bg-subtle: #e9edf3;
+  --color-bg-elevated: #f7f8f5;
   --color-text: var(--color-ink);
-  --color-text-muted: var(--color-slate);
-  --color-border: #d7dee7;
-  --color-accent: var(--color-amber);
-  --color-accent-contrast: #fffaf3;
-  --color-accent-muted: #f7e6d3;
-  --color-focus: var(--color-amber-deep);
-  --color-danger: #b3261e;
-  --color-danger-bg: #fceceb;
-
-  --shadow-sm: 0 1px 2px rgb(16 21 29 / 0.06);
-  --shadow-md: 0 8px 24px rgb(16 21 29 / 0.1);
+  --color-text-muted: #6b6a5f;
+  --color-line: #d5d4c8;
+  --color-accent: #2c3fcf;
+  --color-accent-contrast: #f3f3ee;
+  --color-focus: #2c3fcf;
+  --color-danger: #a3312a;
+  --color-danger-bg: #f3e2df;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --color-bg: var(--color-ink);
-    --color-bg-subtle: var(--color-navy-mid);
-    --color-text: #eef1f6;
-    --color-text-muted: #92a1b5;
-    --color-border: #2a3648;
-    --color-accent: #e2952f;
-    --color-accent-contrast: #1a1102;
-    --color-accent-muted: #3a2a13;
-    --color-focus: #e2952f;
-    --color-danger: #f2938c;
-    --color-danger-bg: #3a1d1b;
-
-    --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.4);
-    --shadow-md: 0 8px 28px rgb(0 0 0 / 0.5);
+    --color-bg: var(--color-graphite);
+    --color-bg-elevated: #1a1916;
+    --color-text: #ece9e0;
+    --color-text-muted: #9c9a8d;
+    --color-line: #33322b;
+    --color-accent: #8fa0ff;
+    --color-accent-contrast: #131210;
+    --color-danger: #e28f88;
+    --color-danger-bg: #33201d;
   }
 }
 
 /* The viewer's explicit theme toggle (data-theme) wins over the OS
    preference in both directions. */
 :root[data-theme="dark"] {
-  --color-bg: var(--color-ink);
-  --color-bg-subtle: var(--color-navy-mid);
-  --color-text: #eef1f6;
-  --color-text-muted: #92a1b5;
-  --color-border: #2a3648;
-  --color-accent: #e2952f;
-  --color-accent-contrast: #1a1102;
-  --color-accent-muted: #3a2a13;
-  --color-focus: #e2952f;
-  --color-danger: #f2938c;
-  --color-danger-bg: #3a1d1b;
+  --color-bg: var(--color-graphite);
+  --color-bg-elevated: #1a1916;
+  --color-text: #ece9e0;
+  --color-text-muted: #9c9a8d;
+  --color-line: #33322b;
+  --color-accent: #8fa0ff;
+  --color-accent-contrast: #131210;
+  --color-danger: #e28f88;
+  --color-danger-bg: #33201d;
 }
 
 :root[data-theme="light"] {
   --color-bg: var(--color-paper);
-  --color-bg-subtle: #e9edf3;
+  --color-bg-elevated: #f7f8f5;
   --color-text: var(--color-ink);
-  --color-text-muted: var(--color-slate);
-  --color-border: #d7dee7;
-  --color-accent: var(--color-amber);
-  --color-accent-contrast: #fffaf3;
-  --color-accent-muted: #f7e6d3;
-  --color-focus: var(--color-amber-deep);
-  --color-danger: #b3261e;
-  --color-danger-bg: #fceceb;
+  --color-text-muted: #6b6a5f;
+  --color-line: #d5d4c8;
+  --color-accent: #2c3fcf;
+  --color-accent-contrast: #f3f3ee;
+  --color-danger: #a3312a;
+  --color-danger-bg: #f3e2df;
 }

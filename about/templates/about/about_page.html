@@ -4,7 +4,7 @@
 {% block body_class %}template-about{% endblock %}
 
 {% block content %}
-    <section class="container container--narrow about-header">
+    <section class="container container--medium about-header">
         {% if page.profile_image %}
             {% image page.profile_image fill-320x320 class="about-header__image" alt=page.profile_image.title %}
         {% endif %}
@@ -13,24 +13,31 @@
             {% if page.intro %}
                 <div class="richtext">{{ page.intro|richtext }}</div>
             {% endif %}
-            {% if page.resume_pdf %}
-                <p>
-                    <a class="button" href="{{ page.resume_pdf.url }}">
-                        Download resume (PDF{% if page.resume_pdf.file_size %}, {{ page.resume_pdf.file_size|filesizeformat }}{% endif %})
-                    </a>
-                </p>
+            {% if page.resume_pdf or page.resume_pdf_pt %}
+                <div class="button-row">
+                    {% if page.resume_pdf %}
+                        <a class="button" href="{{ page.resume_pdf.url }}">
+                            Resume (EN{% if page.resume_pdf.file_size %}, {{ page.resume_pdf.file_size|filesizeformat }}{% endif %})
+                        </a>
+                    {% endif %}
+                    {% if page.resume_pdf_pt %}
+                        <a class="button{% if page.resume_pdf %} button--outline{% endif %}" href="{{ page.resume_pdf_pt.url }}">
+                            Resume (PT{% if page.resume_pdf_pt.file_size %}, {{ page.resume_pdf_pt.file_size|filesizeformat }}{% endif %})
+                        </a>
+                    {% endif %}
+                </div>
             {% endif %}
         </div>
     </section>
 
     {% with experiences=page.work_experiences.all %}
         {% if experiences %}
-            <section class="container container--narrow">
+            <section class="container container--medium">
                 <p class="eyebrow">Experience</p>
                 <h2>Work history</h2>
                 <div class="cv-timeline">
                     {% for entry in experiences %}
-                        <article class="cv-entry">
+                        <article class="cv-entry{% if not entry.end_date %} cv-entry--current{% endif %}">
                             <p class="cv-entry__dates">
                                 {{ entry.start_date|date:"M Y" }} &ndash;
                                 {% if entry.end_date %}{{ entry.end_date|date:"M Y" }}{% else %}Present{% endif %}
@@ -56,7 +63,7 @@
 
     {% with education=page.education_entries.all %}
         {% if education %}
-            <section class="container container--narrow">
+            <section class="container container--medium">
                 <p class="eyebrow">Education</p>
                 <h2>Academic background</h2>
                 <div class="cv-timeline">
@@ -86,7 +93,7 @@
 
     {% with certificates=page.certificates.all %}
         {% if certificates %}
-            <section class="container container--narrow">
+            <section class="container container--medium">
                 <p class="eyebrow">Certificates</p>
                 <h2>Certifications</h2>
                 <ul class="cert-list">
@@ -107,21 +114,17 @@
     {% endwith %}
 
     {% if page.get_grouped_skills %}
-        <section class="container container--narrow">
+        <section class="container container--medium">
             <p class="eyebrow">Skills</p>
             <h2>Toolbox</h2>
-            <div class="stack">
+            <dl>
                 {% for category, skills in page.get_grouped_skills.items %}
-                    <div class="skill-group">
-                        <h3>{{ skills.0.get_category_display_name }}</h3>
-                        <ul class="tag-list">
-                            {% for skill in skills %}
-                                <li class="tag">{{ skill.name }}</li>
-                            {% endfor %}
-                        </ul>
+                    <div class="skill-row">
+                        <dt>{{ skills.0.get_category_display_name }}</dt>
+                        <dd>{% for skill in skills %}{{ skill.name }}{% if not forloop.last %} &middot; {% endif %}{% endfor %}</dd>
                     </div>
                 {% endfor %}
-            </div>
+            </dl>
         </section>
     {% endif %}
 {% endblock content %}

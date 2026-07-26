@@ -6,6 +6,7 @@
 
 html {
   color-scheme: light dark;
+  scroll-padding-top: 2rem;
 }
 
 :root[data-theme="dark"] {
@@ -39,6 +40,7 @@ h4 {
   font-family: var(--font-display);
   font-weight: 600;
   line-height: var(--leading-tight);
+  letter-spacing: -0.01em;
   text-wrap: balance;
 }
 
@@ -57,20 +59,25 @@ h4 {
 }
 
 a {
+  color: inherit;
+}
+
+.richtext a,
+.lede a {
   color: var(--color-accent);
 }
 
 @media (prefers-reduced-motion: no-preference) {
   a,
   .button,
-  .card,
+  .link-arrow,
+  .index-row,
   .tag {
     transition:
       color 0.15s ease,
       background-color 0.15s ease,
       border-color 0.15s ease,
-      transform 0.15s ease,
-      box-shadow 0.15s ease;
+      opacity 0.2s ease;
   }
 }
 
@@ -82,9 +89,8 @@ textarea:focus-visible,
 select:focus-visible,
 summary:focus-visible,
 [tabindex]:focus-visible {
-  outline: 3px solid var(--color-focus);
+  outline: 2px solid var(--color-focus);
   outline-offset: 2px;
-  border-radius: 2px;
 }
 
 .visually-hidden {
@@ -103,10 +109,9 @@ summary:focus-visible,
   position: absolute;
   top: -100%;
   left: var(--space-3);
-  background: var(--color-accent);
-  color: var(--color-accent-contrast);
+  background: var(--color-ink);
+  color: var(--color-paper);
   padding: var(--space-2) var(--space-3);
-  border-radius: var(--radius);
   z-index: 100;
   font-family: var(--font-display);
   font-weight: 600;
@@ -116,49 +121,100 @@ summary:focus-visible,
   top: var(--space-3);
 }
 
-/* Header / nav ------------------------------------------------------- */
+/* Frame -----------------------------------------------------------------
+   The whole site is two columns: a fixed-width spine (identity + index of
+   sections + a colophon) and the content column. This replaces the usual
+   sticky top navbar - it reads as a book's running margin, not a product
+   header, which is the point. */
 
-.site-header {
-  border-bottom: var(--border-width) solid var(--color-border);
-  position: sticky;
-  top: 0;
-  background: color-mix(in srgb, var(--color-bg) 92%, transparent);
-  backdrop-filter: blur(8px);
-  z-index: 10;
+.frame {
+  min-height: 100vh;
 }
 
-.site-header__inner {
-  max-width: var(--wide-width);
-  margin-inline: auto;
-  padding: var(--space-3) var(--space-4);
+@media (min-width: 64rem) {
+  .frame {
+    display: grid;
+    grid-template-columns: var(--spine-width) 1fr;
+    align-items: start;
+  }
+}
+
+.spine {
+  border-bottom: var(--border-width) solid var(--color-line);
+}
+
+@media (min-width: 64rem) {
+  .spine {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    border-bottom: 0;
+    border-right: var(--border-width) solid var(--color-line);
+  }
+}
+
+.spine__inner {
+  padding: var(--space-4);
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--space-3);
 }
 
-.site-header__brand {
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: var(--step-0);
+@media (min-width: 64rem) {
+  .spine__inner {
+    height: 100%;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: var(--space-5) var(--space-4);
+  }
+}
+
+.spine__mark {
+  display: flex;
+  flex-direction: column;
   text-decoration: none;
   color: var(--color-text);
-  white-space: nowrap;
+  font-family: var(--font-display);
+  line-height: 0.92;
 }
 
-.site-header__brand::before {
-  content: "~/";
-  color: var(--color-accent);
+.spine__mark-line {
+  font-size: var(--step-2);
+  font-weight: 700;
+  letter-spacing: -0.02em;
 }
 
-.primary-nav {
-  position: relative;
+.spine__mark-line--outline {
+  color: transparent;
+  -webkit-text-stroke: 1.25px var(--color-text);
+  margin-top: 0.05em;
+}
+
+@supports not (-webkit-text-stroke: 1px black) {
+  .spine__mark-line--outline {
+    color: var(--color-text);
+    -webkit-text-stroke: initial;
+    opacity: 0.55;
+  }
+}
+
+@media (min-width: 64rem) {
+  .spine__mark-line {
+    font-size: var(--step-3);
+  }
+
+  .spine__mark-line--outline {
+    -webkit-text-stroke-width: 1.5px;
+  }
 }
 
 /* Mobile nav uses the checkbox-toggle pattern (not <details>, whose
    closed-state box collapses to 0x0 in every engine even when the child
-   list's display is forced open via CSS - the checkbox + sibling selector
-   approach below has no such quirk, and needs no JS either). */
+   list's display is forced open via CSS). On mobile it opens a full
+   overlay panel; at the spine breakpoint the toggle disappears and the
+   index is simply always visible down the rail. */
 .nav-toggle-input {
   position: absolute;
   opacity: 0;
@@ -167,99 +223,109 @@ summary:focus-visible,
   overflow: hidden;
 }
 
-.nav-disclosure__toggle {
+.spine__toggle {
   cursor: pointer;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: var(--space-2);
-  padding: var(--space-2) var(--space-3);
-  border: var(--border-width) solid var(--color-border);
-  border-radius: var(--radius);
   font-family: var(--font-display);
+  font-weight: 600;
   font-size: var(--step--1);
-  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
   user-select: none;
 }
 
-.nav-disclosure__toggle::before {
-  content: "";
-  width: 1em;
-  height: 1em;
-  flex-shrink: 0;
-  background-color: currentColor;
-  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M3 6h18M3 12h18M3 18h18'/%3E%3C/svg%3E") center / contain no-repeat;
-  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M3 6h18M3 12h18M3 18h18'/%3E%3C/svg%3E") center / contain no-repeat;
+.spine__toggle::before {
+  content: "Index";
 }
 
-.nav-toggle-input:checked ~ .nav-disclosure__toggle::before {
-  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M6 6l12 12M18 6L6 18'/%3E%3C/svg%3E");
-  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M6 6l12 12M18 6L6 18'/%3E%3C/svg%3E");
+.nav-toggle-input:checked ~ .spine__toggle::before {
+  content: "Close";
 }
 
-.nav-toggle-input:focus-visible ~ .nav-disclosure__toggle {
-  outline: 3px solid var(--color-focus);
+.nav-toggle-input:focus-visible ~ .spine__toggle {
+  outline: 2px solid var(--color-focus);
   outline-offset: 2px;
 }
 
-.nav-disclosure__list {
+.spine__nav {
+  display: none;
+}
+
+.nav-toggle-input:checked ~ .spine__nav {
+  display: block;
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: var(--color-bg);
+  padding: var(--space-6) var(--space-4) var(--space-4);
+  overflow-y: auto;
+}
+
+.spine__nav-list {
   list-style: none;
   margin: 0;
-  padding: var(--space-2);
-  display: none;
-  flex-direction: column;
-  gap: var(--space-1);
-  position: absolute;
-  top: calc(100% + var(--space-2));
-  right: 0;
-  min-width: 12rem;
-  background: var(--color-bg);
-  border: var(--border-width) solid var(--color-border);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow-md);
+  padding: 0;
+  counter-reset: nav-index;
 }
 
-.nav-toggle-input:checked ~ .nav-disclosure__list {
+.spine__nav-list li {
+  counter-increment: nav-index;
+  border-top: var(--border-width) solid var(--color-line);
+}
+
+.spine__nav-list li:last-child {
+  border-bottom: var(--border-width) solid var(--color-line);
+}
+
+.spine__nav-list a {
   display: flex;
-}
-
-.nav-disclosure__list a {
-  display: block;
-  padding: var(--space-2) var(--space-3);
-  border-radius: var(--radius);
+  align-items: baseline;
+  gap: var(--space-3);
+  padding: var(--space-3) 0;
   text-decoration: none;
-  color: var(--color-text);
-  font-weight: 500;
+  font-family: var(--font-display);
+  font-size: var(--step-3);
+  font-weight: 600;
 }
 
-.nav-disclosure__list a:hover {
-  background: var(--color-bg-subtle);
+@media (min-width: 64rem) {
+  .spine__nav-list a {
+    font-size: var(--step-1);
+    padding: var(--space-2) 0;
+  }
 }
 
-.nav-disclosure__list a[aria-current="page"] {
+.spine__nav-list a::before {
+  content: counter(nav-index, decimal-leading-zero);
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  font-weight: 400;
+  color: var(--color-text-muted);
+}
+
+.spine__nav-list a:hover,
+.spine__nav-list a[aria-current="page"] {
   color: var(--color-accent);
-  background: var(--color-accent-muted);
 }
 
-/* Wide viewports: nav is always a plain horizontal row, no disclosure.
-   Items keep their padded hover/active pill from the base rules above -
-   only the outer gap shrinks, since the padding now does most of the
-   visual separation between items. */
-@media (min-width: 48rem) {
-  .nav-disclosure__toggle {
+@media (min-width: 64rem) {
+  .spine__toggle {
     display: none;
   }
 
-  .nav-disclosure__list {
-    display: flex;
+  .spine__nav {
+    display: block;
     position: static;
-    flex-direction: row;
-    align-items: center;
-    gap: var(--space-1);
-    padding: 0;
     background: none;
-    border: none;
-    box-shadow: none;
+    padding: 0;
+    overflow: visible;
   }
+}
+
+.content-column {
+  min-width: 0;
 }
 
 main {
@@ -274,6 +340,10 @@ main {
 
 .container--narrow {
   max-width: var(--content-width);
+}
+
+.container--medium {
+  max-width: var(--content-width-wide);
 }
 
 .stack {
@@ -298,16 +368,15 @@ section {
 
 .section-divider {
   border: none;
-  border-top: var(--border-width) solid var(--color-border);
+  border-top: var(--border-width) solid var(--color-line);
   margin: 0;
 }
 
-/* Footer --------------------------------------------------------------- */
+/* Footer - a single colophon line, not a link farm. */
 
 .site-footer {
-  border-top: var(--border-width) solid var(--color-border);
-  margin-top: var(--space-6);
-  padding-block: var(--space-5);
+  border-top: var(--border-width) solid var(--color-line);
+  padding-block: var(--space-4);
   color: var(--color-text-muted);
   font-size: var(--step--1);
 }
@@ -323,27 +392,28 @@ section {
   gap: var(--space-3);
 }
 
+.site-footer .richtext,
+.site-footer .richtext p {
+  margin: 0;
+}
+
 .social-links {
   display: flex;
-  gap: var(--space-4);
   list-style: none;
   margin: 0;
   padding: 0;
-  font-family: var(--font-display);
 }
 
 .social-links a {
-  color: var(--color-text-muted);
   text-decoration: none;
+}
+
+.social-links li:not(:last-child)::after {
+  content: "\00b7";
+  margin-inline: var(--space-2);
+  color: var(--color-line);
 }
 
 .social-links a:hover {
   color: var(--color-accent);
-}
-
-@media (max-width: 30rem) {
-  .site-footer__inner {
-    flex-direction: column;
-    align-items: flex-start;
-  }
 }

@@ -6,7 +6,7 @@
 
 {% block content %}
     <section>
-        <article class="container container--narrow">
+        <article class="container container--medium">
             <header class="stack">
                 <h1>{{ page.title }}</h1>
                 <p class="lede">{{ page.summary }}</p>
@@ -20,7 +20,7 @@
                     {% endif %}
                 {% endwith %}
                 {% if page.repo_url or page.live_url %}
-                    <div class="hero__actions">
+                    <div class="button-row">
                         {% if page.live_url %}
                             <a class="button" href="{{ page.live_url }}">View live</a>
                         {% endif %}

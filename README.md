@@ -5,32 +5,23 @@ contact form.
 
 ## Local development
 
-Requires Docker.
+Dependencies are managed with [uv](https://docs.astral.sh/uv/) via
+`pyproject.toml` / `uv.lock` (no `requirements.txt`). Local dev uses SQLite
+by default (see `website/settings/dev.py`) - no database server to run.
 
 ```bash
-cp .env.example .env          # edit SECRET_KEY etc. if you like
-docker compose up -d          # starts postgres, mailhog, and the web app
-docker compose exec web python manage.py migrate
-docker compose exec web python manage.py createsuperuser
+uv sync                          # installs prod + dev deps into .venv
+cp .env.example .env             # edit SECRET_KEY etc. if you like
+uv run python manage.py migrate
+uv run python manage.py createsuperuser
+uv run python manage.py runserver
 ```
 
 Site: http://localhost:8000
 Admin: http://localhost:8000/admin/
-Mailhog (catches contact-form emails in dev): http://localhost:8025
 
-Code changes on the host are picked up live (the `web` service bind-mounts
-the repo and runs `manage.py runserver`).
-
-### Running without Docker
-
-Dependencies are managed with [uv](https://docs.astral.sh/uv/) via
-`pyproject.toml` / `uv.lock` (no `requirements.txt`).
-
-```bash
-uv sync                      # installs prod + dev deps into .venv
-uv run python manage.py migrate
-uv run python manage.py runserver
-```
+Emails (e.g. contact-form submissions) print to the console in dev - see
+`EMAIL_URL` in `.env.example`.
 
 `uv add <package>` / `uv remove <package>` to change dependencies —
 commit the updated `uv.lock`.
@@ -38,16 +29,17 @@ commit the updated `uv.lock`.
 ## Tests and linting
 
 ```bash
-docker compose exec web python manage.py test
-docker compose exec web ruff check .
-docker compose exec web ruff format .
+uv run python manage.py test
+uv run ruff check .
+uv run ruff format .
 ```
 
 ## Content structure
 
 - **Home** — StreamField sections (hero, featured projects, latest posts, CTA).
 - **About** — bio, work experience / education / certificates / skills
-  (all editable inline), optional downloadable resume PDF.
+  (all editable inline), optional downloadable resume PDF (English and,
+  optionally, a second Portuguese PDF shown alongside it).
 - **Projects** — index + detail pages, tech-stack tags, gallery, StreamField
   body (headings, rich text, images, quotes, embeds, syntax-highlighted
   code blocks).
@@ -62,8 +54,9 @@ change to update.
 
 ## Deployment
 
-Two deployment paths are set up, sharing the same `Dockerfile`
-(gunicorn, WhiteNoise-served static files, `collectstatic` at build time):
+Two deployment paths are set up, both using the same `Dockerfile` (gunicorn,
+WhiteNoise-served static files, `collectstatic` at build time) - Docker is
+only used in production, not for local development.
 
 ### Self-hosted VM (`docker-compose.prod.yml`) — recommended for this project
 

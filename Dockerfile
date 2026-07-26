@@ -29,15 +29,6 @@ COPY pyproject.toml uv.lock /app/
 RUN uv sync --frozen --no-install-project --no-dev
 
 
-# DEV STAGE
-# Adds the `dev` dependency group (ruff, etc.) on top of the builder stage.
-# docker-compose targets this stage directly for local development, and
-# bind-mounts the repo over /app at runtime.
-FROM builder AS dev
-
-RUN uv sync --frozen --no-install-project
-
-
 # RUNTIME STAGE
 # Use an official Python runtime based on Debian 12 "bookworm" as a parent image.
 FROM python:3.12-slim-bookworm AS runtime

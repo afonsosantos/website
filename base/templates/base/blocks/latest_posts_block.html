@@ -4,22 +4,19 @@
         <div class="section-heading">
             <h2>{{ value.heading }}</h2>
             {% if posts %}
-                <a href="{% pageurl posts.0.get_parent %}" class="button button--outline">View all posts</a>
+                <a href="{% pageurl posts.0.get_parent %}" class="link-arrow">View all posts</a>
             {% endif %}
         </div>
-        <div class="card-grid">
+        <div class="index-list">
             {% for post in posts %}
-                <article class="card">
+                <article class="index-row">
+                    <p class="index-row__index">{{ forloop.counter|stringformat:"02d" }}</p>
+                    <h3 class="index-row__title"><a href="{% pageurl post %}">{{ post.title }}</a></h3>
+                    <p class="index-row__summary">{{ post.intro }}</p>
+                    <p class="index-row__meta">{{ post.date|date:"j F Y" }}</p>
                     {% if post.cover_image %}
-                        {% image post.cover_image fill-640x360 class="card__image" alt="" %}
-                    {% else %}
-                        <div class="card__image card__image--placeholder" aria-hidden="true"><span>{{ post.title|slice:":1" }}</span></div>
+                        {% image post.cover_image fill-440x330 class="index-row__thumb" alt="" %}
                     {% endif %}
-                    <div class="card__body">
-                        <p class="card__meta">{{ post.date|date:"j F Y" }}</p>
-                        <h3 class="card__title"><a href="{% pageurl post %}">{{ post.title }}</a></h3>
-                        <p class="card__summary">{{ post.intro }}</p>
-                    </div>
                 </article>
             {% empty %}
                 <p>No posts yet.</p>

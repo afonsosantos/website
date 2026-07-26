@@ -8,34 +8,35 @@ A personal website (portfolio / CV / blog / contact form) built on Wagtail 7 + D
 
 ## Commands
 
-All commands run inside the `web` container unless noted. The `web` service bind-mounts the repo and runs `manage.py runserver`, so host-side edits take effect immediately.
+Local dev runs directly with `manage.py runserver` — no Docker, no separate database server. `website/settings/dev.py` defaults to SQLite (`db.sqlite3`) if `DATABASE_URL` isn't set.
 
 ```bash
-# start the stack (postgres, mailhog, web)
-docker compose up -d
+uv sync                       # install/update deps into .venv
 
 # migrations / superuser
-docker compose exec web python manage.py migrate
-docker compose exec web python manage.py createsuperuser
+uv run python manage.py migrate
+uv run python manage.py createsuperuser
 
 # after changing any model (including StreamField block definitions in
 # base/blocks.py — Wagtail migrations track those too)
-docker compose exec web python manage.py makemigrations
-docker compose exec web python manage.py migrate
+uv run python manage.py makemigrations
+uv run python manage.py migrate
 
 # tests — full suite or a single app/test
-docker compose exec web python manage.py test
-docker compose exec web python manage.py test blog
-docker compose exec web python manage.py test contact.tests.ContactPageSubmissionTests.test_valid_submission_creates_record_and_sends_email
+uv run python manage.py test
+uv run python manage.py test blog
+uv run python manage.py test contact.tests.ContactPageSubmissionTests.test_valid_submission_creates_record_and_sends_email
 
 # lint / format
-docker compose exec web ruff check .
-docker compose exec web ruff format .
+uv run ruff check .
+uv run ruff format .
+
+uv run python manage.py runserver
 ```
 
-Dependencies are managed with [uv](https://docs.astral.sh/uv/) (`pyproject.toml` + `uv.lock` — no `requirements.txt`). To run without Docker: `uv sync`, then `uv run python manage.py ...`. Use `uv add <package>` / `uv remove <package>` and commit the updated `uv.lock`; don't hand-edit dependency versions in `pyproject.toml`.
+Dependencies are managed with [uv](https://docs.astral.sh/uv/) (`pyproject.toml` + `uv.lock` — no `requirements.txt`). Use `uv add <package>` / `uv remove <package>` and commit the updated `uv.lock`; don't hand-edit dependency versions in `pyproject.toml`.
 
-Site: http://localhost:8000 · Admin: http://localhost:8000/admin/ · Mailhog (catches contact-form emails in dev): http://localhost:8025
+Site: http://localhost:8000 · Admin: http://localhost:8000/admin/ · Emails print to the console in dev (see `EMAIL_URL` in `.env.example`).
 
 ## Architecture
 
@@ -51,30 +52,33 @@ Changing `base/blocks.py` changes the migration state of every app whose StreamF
 
 `projects.Technology` and `blog.BlogCategory` are `@register_snippet` models (shared taxonomies across pages), while `blog` tags use the standard Wagtail/taggit `ClusterTaggableManager` + `TaggedItemBase` pattern (`BlogPageTag`). Don't add a fifth taxonomy mechanism — extend one of these three depending on whether it's a controlled vocabulary (snippet) or freeform (taggit).
 
+The CV itself is single-language. The only bilingual piece is the resume download — `AboutPage.resume_pdf` (English) and `resume_pdf_pt` (Português) are just two separate uploaded files, and the template shows both download buttons whenever both are set. This was a deliberate scope cut: don't extend it into full page-content translation (per-language `intro`/`intro_pt` fields, duplicated work-experience/education entries, etc.) unless explicitly asked for — that was tried once and explicitly rejected in favor of keeping this scoped to just the resume file.
+
 `BlogIndexPage.get_context()` filters the category list down to categories actually used by a *live* post (`BlogCategory.objects.filter(blogpage__in=self.get_posts())`) rather than listing every snippet — an unused category is a dead filter option, not a useful one. Keep that pattern if you add a similar filter (e.g. a tag cloud) elsewhere.
 
 ### Settings split and env handling
 
-`website/settings/{base,dev,production}.py`, all env-driven via `django-environ`. `production.py` does `from .base import *` and is intentionally exempted from ruff's F403/F405 in `pyproject.toml`. Media storage in `production.py` switches to S3 (`storages.backends.s3.S3Storage`) only if `AWS_STORAGE_BUCKET_NAME` is set — leave it unset for the VM deployment path, where media lives in a local Docker volume instead.
+`website/settings/{base,dev,production}.py`, all env-driven via `django-environ`. `dev.py` defaults `DATABASE_URL` to a local SQLite file and `EMAIL_URL` to the console backend, so local dev needs no external services. `production.py` does `from .base import *` and is intentionally exempted from ruff's F403/F405 in `pyproject.toml`. Media storage in `production.py` switches to S3 (`storages.backends.s3.S3Storage`) only if `AWS_STORAGE_BUCKET_NAME` is set — leave it unset for the VM deployment path, where media lives in a local Docker volume instead.
 
 ### Two deployment paths, one Dockerfile
 
-`Dockerfile` is multi-stage: `builder` (uv-installed prod deps only) → `dev` (adds the `dev` dependency group on top, bind-mount target for `docker-compose.yml`) → `runtime` (the production image, COPYs the app in, runs `collectstatic` at build time with throwaway env values, then `migrate && gunicorn` at container start).
+Docker is a production-only concern in this repo — local dev runs `manage.py runserver` directly, no containers involved. `Dockerfile` is multi-stage: `builder` (uv-installed prod deps only) → `runtime` (the production image, COPYs the app in, runs `collectstatic` at build time with throwaway env values, then `migrate && gunicorn` at container start).
 
-- `docker-compose.yml` — local dev, targets the `dev` stage.
-- `docker-compose.prod.yml` — self-hosted VM deployment (the recommended path for this project): Postgres and uploaded media both live in named Docker volumes on the VM itself (no managed DB, no S3), fronted by Caddy (`Caddyfile`) for automatic HTTPS. Has its own explicit `name: website-prod` — do not remove that, since without it Compose derives the project name from the directory and collides with `docker-compose.yml`'s containers/volumes/images (this happened once; see git history).
-- PaaS deployment (Render/Fly/Railway) is also supported by the plain `runtime` stage against a managed Postgres + S3 media — see README for details. Don't assume PaaS when changing deployment-related code; check which path a change targets.
+- `docker-compose.prod.yml` — self-hosted VM deployment (the recommended path for this project): Postgres and uploaded media both live in named Docker volumes on the VM itself (no managed DB, no S3), fronted by Caddy (`Caddyfile`) for automatic HTTPS. Has its own explicit `name: website-prod`.
+- PaaS deployment (Render/Fly/Railway) is also supported by the plain `runtime` stage against a managed Postgres + S3 media — see README for details.
+
+Don't assume one when changing deployment-related code; check which path a change targets.
 
 ### Design system
 
-`website/static/css/{tokens,layout,components,code}.css`, loaded in that order from `website/templates/base.html`. `tokens.css` defines the palette/type-scale as custom properties (light default, overridden under both `@media (prefers-color-scheme: dark)` and `:root[data-theme="dark"/"light"]` for an explicit toggle) — style everything through the tokens, not with hardcoded colors. Fonts (JetBrains Mono for headings/labels, Public Sans for body) are self-hosted under `website/static/fonts/`, no font CDN.
+`website/static/css/{tokens,layout,components,code}.css`, loaded in that order from `website/templates/base.html`. `tokens.css` defines the palette/type-scale as custom properties (light default, overridden under both `@media (prefers-color-scheme: dark)` and `:root[data-theme="dark"/"light"]` for an explicit toggle) — style everything through the tokens, not with hardcoded colors. Two font families carry the whole site (self-hosted under `website/static/fonts/`, no font CDN): Clash Display for headings and the sidebar wordmark, General Sans for body copy. JetBrains Mono is used only inside code blocks, not as a UI font.
 
-Two non-obvious CSS fixes worth knowing before you touch related markup:
-- `.card__image` needs `height: auto` explicitly — Wagtail's `{% image %}` tag emits `width`/`height` attributes matching the rendition exactly, which makes the browser treat height as definite and ignore the `aspect-ratio` CSS property unless overridden.
-- The mobile nav (`base/templates/base/includes/primary_nav.html`) uses a checkbox + sibling-selector toggle, not `<details>`/`<summary>` — a closed `<details>` element's box collapses to 0×0 in every engine even if you force the child's `display` back open with CSS, which breaks a "always-open on desktop, collapsible on mobile" nav.
+The layout is a fixed-width left "spine" (`base/templates/base/includes/primary_nav.html`, `.frame`/`.spine` in `layout.css`), not a top navbar: an identity mark, a numbered index of pages, and a colophon, sticky down the left side above the `64rem` breakpoint and collapsing to a full-screen overlay below it. Project/post listings (`.index-list`/`.index-row` in `components.css`) are numbered rows with a hover-revealed thumbnail rather than a card grid — `.card-grid` still exists, but only for the plain image gallery on project pages, with no card styling.
+
+Two non-obvious things worth knowing before you touch related markup:
+- The mobile nav's checkbox (`#nav-toggle`) must stay the *first* child inside `.spine__inner`, before `.spine__mark`, the toggle `<label>`, and `.spine__nav`. The CSS reveals the nav and swaps the toggle label's text via `:checked ~` (general sibling) selectors, which only match elements *after* the checkbox in the DOM — move the checkbox later and the toggle silently stops working (no error, it just never opens). A `<details>`/`<summary>` element was tried instead of this checkbox pattern early on and rejected: a closed `<details>`'s box collapses to 0×0 in every engine even if you force the child's `display` back open with CSS.
+- Content-width containers come in three sizes (`tokens.css`'s `--content-width`/`--content-width-wide`/`--wide-width`, `.container--narrow`/`.container--medium`/`.container` in `layout.css`). About, Projects, and Blog (both index and detail pages) all deliberately use `.container--medium` so their content columns line up at the same width — don't reintroduce `.container--narrow` there without a reason.
 
 Code blocks (the `code` block in `BodyStreamBlock`) are highlighted server-side with Pygments (`base/blocks.py`'s `CodeBlock.get_context`) — no client-side JS highlighter. `code.css` holds the generated Pygments theme (light + dark variants); regenerate it with `pygments.formatters.HtmlFormatter(style=...).get_style_defs(...)` if you change the styles, don't hand-edit the color rules.
 
-### Search
-
-Uses Wagtail's built-in DB search backend (`search/views.py`), which automatically uses Postgres full-text search since the project runs on Postgres — no separate search service.
+There is no front-end search page — the `search` app (a custom `/search/` view over Wagtail's DB search backend) was removed as unused. Wagtail's built-in search (`wagtail.search`, used internally by the admin) is unaffected.

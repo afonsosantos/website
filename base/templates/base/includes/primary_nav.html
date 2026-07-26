@@ -1,18 +1,26 @@
 {% load wagtailcore_tags %}
-<nav class="primary-nav" aria-label="Primary">
-    <input type="checkbox" id="nav-toggle" class="nav-toggle-input" />
-    <label for="nav-toggle" class="nav-disclosure__toggle">
-        <span class="nav-disclosure__label">Menu</span>
-    </label>
-    <ul class="nav-disclosure__list">
-        {% for menu_page in menu_pages %}
-            {% pageurl menu_page as menu_url %}
-            <li>
-                <a href="{{ menu_url }}"{% if request.path == menu_url %} aria-current="page"{% endif %}>
-                    {{ menu_page.title }}
-                </a>
-            </li>
-        {% endfor %}
-        <li><a href="{% url 'search' %}">Search</a></li>
-    </ul>
-</nav>
+<header class="spine">
+    <div class="spine__inner">
+        <input type="checkbox" id="nav-toggle" class="nav-toggle-input" />
+
+        <a class="spine__mark" href="/">
+            <span class="spine__mark-line spine__mark-line--solid">Afonso</span>
+            <span class="spine__mark-line spine__mark-line--outline">Santos</span>
+        </a>
+
+        <label for="nav-toggle" class="spine__toggle"></label>
+
+        <nav class="spine__nav" aria-label="Primary">
+            <ol class="spine__nav-list">
+                {% for menu_page in menu_pages %}
+                    {% pageurl menu_page as menu_url %}
+                    <li>
+                        <a href="{{ menu_url }}"{% if request.path == menu_url %} aria-current="page"{% endif %}>
+                            {{ menu_page.title }}
+                        </a>
+                    </li>
+                {% endfor %}
+            </ol>
+        </nav>
+    </div>
+</header>

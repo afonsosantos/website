@@ -1,10 +1,9 @@
-/* Section eyebrows - uppercase mono labels, technical-annotation feel */
+/* Section eyebrows - a small labelled cue, not a decorative pill. */
 .eyebrow {
   display: inline-block;
-  font-family: var(--font-display);
   font-size: var(--step--1);
   font-weight: 600;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--color-accent);
   margin: 0 0 var(--space-2);
@@ -19,9 +18,9 @@
 }
 
 .about-header__image {
-  border-radius: var(--radius);
   width: 8rem;
   height: 8rem;
+  border: var(--border-width) solid var(--color-line);
 }
 
 @media (min-width: 40rem) {
@@ -55,12 +54,12 @@
 }
 
 .pull-quote {
-  border-left: 3px solid var(--color-accent);
+  border-left: 2px solid var(--color-accent);
   margin: var(--space-4) 0;
   padding: var(--space-2) var(--space-4);
   font-size: var(--step-1);
-  color: var(--color-text-muted);
   font-style: italic;
+  color: var(--color-text-muted);
 }
 
 .pull-quote cite {
@@ -68,7 +67,6 @@
   margin-top: var(--space-2);
   font-size: var(--step--1);
   font-style: normal;
-  font-family: var(--font-display);
 }
 
 .stream-image,
@@ -76,21 +74,31 @@
   margin: var(--space-4) 0;
 }
 
+/* Plain responsive image grid - used for a project's gallery. No card
+   chrome here, the photos carry it. */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  gap: var(--space-4);
+}
+
+.card-grid .stream-image {
+  margin: 0;
+}
+
 /* Code blocks (Pygments server-side highlighting, see code.css) */
 .code-block {
   margin: var(--space-4) 0;
-  border-radius: var(--radius);
   overflow: hidden;
-  border: var(--border-width) solid var(--color-border);
-  box-shadow: var(--shadow-sm);
+  border: var(--border-width) solid var(--color-line);
 }
 
 .code-block__filename {
   font-family: var(--font-mono);
   font-size: var(--step--1);
   padding: var(--space-2) var(--space-3);
-  background: var(--color-bg-subtle);
-  border-bottom: var(--border-width) solid var(--color-border);
+  background: var(--color-bg-elevated);
+  border-bottom: var(--border-width) solid var(--color-line);
   color: var(--color-text-muted);
 }
 
@@ -105,7 +113,6 @@
 }
 
 .stream-image img {
-  border-radius: var(--radius);
   width: 100%;
   height: auto;
 }
@@ -115,7 +122,6 @@
   font-size: var(--step--1);
   color: var(--color-text-muted);
   margin-top: var(--space-2);
-  font-family: var(--font-display);
 }
 
 .stream-embed .responsive-embed {
@@ -132,25 +138,41 @@
   border: 0;
 }
 
-/* Buttons */
+/* Buttons - reserved for the one or two real actions on a page. A solid
+   ink block reads as a poster, not a UI widget; everything else is a
+   plain underlined link so it doesn't compete with it. */
 .button {
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
-  padding: var(--space-2) var(--space-4);
-  border-radius: var(--radius);
-  background: var(--color-accent);
-  color: var(--color-accent-contrast);
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-ink);
+  color: var(--color-paper);
   text-decoration: none;
   font-family: var(--font-display);
   font-weight: 600;
   font-size: var(--step--1);
-  border: var(--border-width) solid transparent;
+  border: var(--border-width) solid var(--color-ink);
   cursor: pointer;
 }
 
+@media (prefers-color-scheme: dark) {
+  .button {
+    background: var(--color-text);
+    color: var(--color-graphite);
+    border-color: var(--color-text);
+  }
+}
+:root[data-theme="dark"] .button {
+  background: var(--color-text);
+  color: var(--color-graphite);
+  border-color: var(--color-text);
+}
+
 .button:hover {
-  background: var(--color-amber-deep);
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: var(--color-accent-contrast);
 }
 
 .button:active {
@@ -160,7 +182,7 @@
 .button--outline {
   background: transparent;
   color: var(--color-text);
-  border-color: var(--color-border);
+  border-color: var(--color-line);
 }
 
 .button--outline:hover {
@@ -169,105 +191,147 @@
   background: transparent;
 }
 
-/* Cards (project / post listings) */
-.card-grid {
-  display: grid;
-  /* auto-fit (not auto-fill) collapses tracks that have no card into
-     them - auto-fill would reserve their width anyway, leaving real
-     cards narrower than the row with dead invisible gaps. Capping the
-     max (rather than 1fr) keeps cards from stretching edge-to-edge when
-     there are only one or two of them. */
-  grid-template-columns: repeat(auto-fit, minmax(16rem, 22rem));
-  gap: var(--space-4);
+.button-row {
+  display: flex;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+  flex-wrap: wrap;
 }
 
-.card {
-  border: var(--border-width) solid var(--color-border);
-  border-radius: var(--radius);
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  background: var(--color-bg);
-  position: relative;
+/* A plain text action - underline plus a nudge arrow, for anything that
+   isn't the page's one primary action. */
+.link-arrow {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  font-family: var(--font-display);
+  font-weight: 600;
+}
+
+.link-arrow::after {
+  content: "\2192";
+  display: inline-block;
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .card:hover {
-    border-color: var(--color-accent);
-    box-shadow: var(--shadow-md);
-    transform: translateY(-2px);
+  .link-arrow::after {
+    transition: transform 0.15s ease;
+  }
+
+  .link-arrow:hover::after {
+    transform: translateX(0.2em);
   }
 }
 
-.card__image {
-  aspect-ratio: 16 / 9;
-  object-fit: cover;
-  width: 100%;
-  /* The {% image %} tag emits width/height attributes matching the
-     rendition exactly (e.g. 640x360). With both attributes present the
-     browser treats height as definite and ignores aspect-ratio unless we
-     explicitly free it back up here. */
-  height: auto;
-  background: var(--color-bg-subtle);
+/* Index list - projects and posts read as a table of contents, not a
+   grid of product cards. The row number is real ordering information
+   (featured order / reverse chronological), not decoration. */
+.index-list {
+  border-top: var(--border-width) solid var(--color-line);
 }
 
-/* Shown instead of card__image when a project/post has no cover image,
-   so mixed grids (some cards with a real image, some without) keep a
-   consistent rhythm rather than some cards being shorter than others. */
-.card__image--placeholder {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: var(--color-bg-subtle);
-  background-image:
-    linear-gradient(var(--color-border) 1px, transparent 1px),
-    linear-gradient(90deg, var(--color-border) 1px, transparent 1px);
-  background-size: 1.25rem 1.25rem;
+.index-row {
+  position: relative;
+  display: grid;
+  grid-template-columns: 3rem 1fr;
+  gap: var(--space-1) var(--space-4);
+  padding-block: var(--space-4);
+  border-bottom: var(--border-width) solid var(--color-line);
 }
 
-.card__image--placeholder span {
-  font-family: var(--font-display);
-  font-size: var(--step-3);
-  font-weight: 700;
-  color: var(--color-border);
+.index-row__index {
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  color: var(--color-text-muted);
+  padding-top: 0.3em;
 }
 
-.card__body {
-  padding: var(--space-4);
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-  flex: 1;
-}
-
-.card__title {
-  font-size: var(--step-1);
+.index-row__title {
   margin: 0;
+  font-size: var(--step-2);
 }
 
-.card__title a {
+.index-row__title a {
   text-decoration: none;
   color: var(--color-text);
 }
 
-.card__title a::after {
+.index-row__title a::after {
   content: "";
   position: absolute;
   inset: 0;
 }
 
-.card__meta {
+.index-row:hover .index-row__title a {
+  color: var(--color-accent);
+}
+
+.index-row__summary {
+  grid-column: 2 / 3;
+  margin: var(--space-1) 0 0;
+  max-width: 40rem;
   color: var(--color-text-muted);
-  font-family: var(--font-display);
+}
+
+.index-row__meta {
+  grid-column: 2 / 3;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+  margin-top: var(--space-2);
   font-size: var(--step--1);
-}
-
-.card__summary {
   color: var(--color-text-muted);
-  margin: 0;
 }
 
-/* Tags / pills - small-caps mono chips, read like tech-stack badges */
+.index-row__thumb {
+  display: none;
+}
+
+@media (min-width: 56rem) {
+  .index-row {
+    grid-template-columns: 3rem 1fr auto;
+    align-items: start;
+  }
+
+  .index-row__meta {
+    grid-column: 3 / 4;
+    grid-row: 1 / 3;
+    margin-top: 0;
+    flex-direction: column;
+    align-items: flex-end;
+    text-align: right;
+    width: 9rem;
+  }
+
+  .index-row__thumb {
+    display: block;
+    position: absolute;
+    right: var(--space-4);
+    top: 50%;
+    width: 11rem;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    transform: translateY(-50%);
+    opacity: 0;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .index-row__thumb {
+      transition: opacity 0.2s ease;
+    }
+  }
+
+  .index-row:hover .index-row__thumb {
+    opacity: 1;
+  }
+}
+
+/* Tags - plain bordered labels, not coloured pills. */
 .tag-list {
   display: flex;
   flex-wrap: wrap;
@@ -280,35 +344,40 @@
 .tag {
   display: inline-block;
   padding: var(--space-1) var(--space-3);
-  border-radius: 999px;
-  background: var(--color-accent-muted);
-  color: var(--color-amber-deep);
-  font-family: var(--font-display);
+  background: transparent;
+  color: var(--color-text-muted);
+  font-family: var(--font-mono);
   font-size: var(--step--1);
-  font-weight: 500;
   text-decoration: none;
-  border: var(--border-width) solid transparent;
-}
-
-@media (prefers-color-scheme: dark) {
-  .tag {
-    color: var(--color-accent);
-  }
-}
-:root[data-theme="dark"] .tag {
-  color: var(--color-accent);
+  border: var(--border-width) solid var(--color-line);
 }
 
 a.tag:hover {
   border-color: var(--color-accent);
+  color: var(--color-accent);
 }
 
 .tag[aria-current="true"] {
-  background: var(--color-accent);
-  color: var(--color-accent-contrast);
+  background: var(--color-ink);
+  border-color: var(--color-ink);
+  color: var(--color-paper);
 }
 
-/* Forms */
+@media (prefers-color-scheme: dark) {
+  .tag[aria-current="true"] {
+    background: var(--color-text);
+    border-color: var(--color-text);
+    color: var(--color-graphite);
+  }
+}
+:root[data-theme="dark"] .tag[aria-current="true"] {
+  background: var(--color-text);
+  border-color: var(--color-text);
+  color: var(--color-graphite);
+}
+
+/* Forms - underlined fields read as a considered document, not a boxed
+   web form. */
 .form-field {
   display: flex;
   flex-direction: column;
@@ -317,7 +386,6 @@ a.tag:hover {
 }
 
 .form-field label {
-  font-family: var(--font-display);
   font-weight: 600;
   font-size: var(--step--1);
 }
@@ -326,16 +394,18 @@ a.tag:hover {
 .form-field textarea,
 .form-field select {
   font: inherit;
-  padding: var(--space-2) var(--space-3);
-  border: var(--border-width) solid var(--color-border);
-  border-radius: var(--radius);
-  background: var(--color-bg);
+  padding: var(--space-2) 0;
+  border: none;
+  border-bottom: var(--border-width) solid var(--color-line);
+  border-radius: 0;
+  background: transparent;
   color: var(--color-text);
 }
 
 .form-field input:focus,
 .form-field textarea:focus,
 .form-field select:focus {
+  outline: none;
   border-color: var(--color-accent);
 }
 
@@ -365,7 +435,6 @@ a.tag:hover {
 .form-errors {
   background: var(--color-danger-bg);
   color: var(--color-danger);
-  border-radius: var(--radius);
   padding: var(--space-3) var(--space-4);
   margin-bottom: var(--space-4);
 }
@@ -373,23 +442,47 @@ a.tag:hover {
 /* Search */
 .search-form {
   display: flex;
-  gap: var(--space-2);
+  gap: var(--space-3);
   flex-wrap: wrap;
+  align-items: end;
 }
 
 .search-form input[type="search"] {
   flex: 1;
   min-width: 12rem;
   font: inherit;
-  padding: var(--space-2) var(--space-3);
-  border: var(--border-width) solid var(--color-border);
-  border-radius: var(--radius);
-  background: var(--color-bg);
+  padding: var(--space-2) 0;
+  border: none;
+  border-bottom: var(--border-width) solid var(--color-line);
+  background: transparent;
   color: var(--color-text);
 }
 
 .search-form input[type="search"]:focus {
+  outline: none;
   border-color: var(--color-accent);
+}
+
+.search-results {
+  border-top: var(--border-width) solid var(--color-line);
+}
+
+.search-results li {
+  padding-block: var(--space-4);
+  border-bottom: var(--border-width) solid var(--color-line);
+}
+
+.search-results h2 {
+  font-size: var(--step-1);
+  margin: 0 0 var(--space-1);
+}
+
+.search-results h2 a {
+  text-decoration: none;
+}
+
+.search-results h2 a:hover {
+  color: var(--color-accent);
 }
 
 /* Pagination */
@@ -400,7 +493,6 @@ a.tag:hover {
   padding: 0;
   margin: var(--space-5) 0 0;
   justify-content: center;
-  font-family: var(--font-display);
 }
 
 .pagination a,
@@ -410,71 +502,103 @@ a.tag:hover {
   justify-content: center;
   min-width: 2.5rem;
   height: 2.5rem;
-  border-radius: var(--radius);
   text-decoration: none;
   color: var(--color-text);
+  border: var(--border-width) solid transparent;
 }
 
 .pagination a:hover {
-  background: var(--color-bg-subtle);
+  border-color: var(--color-line);
 }
 
 .pagination [aria-current="page"] {
-  background: var(--color-accent);
-  color: var(--color-accent-contrast);
+  border-color: var(--color-ink);
 }
 
-/* CV timeline (about page) - a real chronological sequence, so the rail
-   and markers encode actual order, not decoration. */
+/* CV rows (about page) - a narrow date column beside the content, the
+   way a well-set résumé is typeset in print, rather than a dot timeline. */
 .cv-timeline {
-  position: relative;
-  padding-left: var(--space-5);
-  border-left: var(--border-width) solid var(--color-border);
+  border-top: var(--border-width) solid var(--color-line);
 }
 
 .cv-entry {
-  position: relative;
-  padding-bottom: var(--space-5);
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-2) var(--space-5);
+  padding-block: var(--space-5);
+  border-bottom: var(--border-width) solid var(--color-line);
 }
 
-.cv-entry:last-child {
-  padding-bottom: 0;
-}
+@media (min-width: 40rem) {
+  .cv-entry {
+    grid-template-columns: 9rem 1fr;
+  }
 
-.cv-entry::before {
-  content: "";
-  position: absolute;
-  left: calc(-1 * var(--space-5) - 5px);
-  top: 0.35em;
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-  background: var(--color-accent);
+  .cv-entry__dates {
+    padding-top: 0.3em;
+  }
 }
 
 .cv-entry__dates {
   color: var(--color-text-muted);
-  font-family: var(--font-display);
+  font-family: var(--font-mono);
   font-size: var(--step--1);
-  margin: 0 0 var(--space-1);
+  margin: 0;
+  white-space: nowrap;
 }
 
 .cv-entry__title {
   margin: 0 0 var(--space-1);
+  font-size: var(--step-2);
 }
 
 .cv-entry__org {
   color: var(--color-text-muted);
-  margin: 0 0 var(--space-2);
+  margin: 0 0 var(--space-3);
 }
 
-.skill-group h3 {
-  font-family: var(--font-display);
+.cv-entry .richtext ul {
+  padding-left: 1.1em;
+}
+
+.cv-entry .richtext li + li {
+  margin-top: var(--space-1);
+}
+
+.cv-entry--current .cv-entry__dates {
+  color: var(--color-accent);
+}
+
+/* Skills - plain labelled lines of text rather than coloured chips. */
+.skill-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-1);
+  padding-block: var(--space-3);
+  border-bottom: var(--border-width) solid var(--color-line);
+}
+
+.skill-row:first-child {
+  border-top: var(--border-width) solid var(--color-line);
+}
+
+@media (min-width: 40rem) {
+  .skill-row {
+    grid-template-columns: 10rem 1fr;
+    gap: var(--space-4);
+  }
+}
+
+.skill-row dt {
+  margin: 0;
   font-size: var(--step--1);
-  color: var(--color-text-muted);
   text-transform: uppercase;
-  letter-spacing: 0.08em;
-  margin-bottom: var(--space-2);
+  letter-spacing: 0.06em;
+  color: var(--color-text-muted);
+}
+
+.skill-row dd {
+  margin: 0;
 }
 
 /* Certificates - a spec-sheet style list, name/issuer left, date right */
@@ -482,6 +606,7 @@ a.tag:hover {
   list-style: none;
   margin: 0;
   padding: 0;
+  border-top: var(--border-width) solid var(--color-line);
 }
 
 .cert-item {
@@ -490,11 +615,7 @@ a.tag:hover {
   justify-content: space-between;
   gap: var(--space-3);
   padding-block: var(--space-3);
-  border-bottom: var(--border-width) solid var(--color-border);
-}
-
-.cert-item:first-child {
-  border-top: var(--border-width) solid var(--color-border);
+  border-bottom: var(--border-width) solid var(--color-line);
 }
 
 .cert-item__name {
@@ -520,7 +641,7 @@ a.tag:hover {
 .cert-item__date {
   margin: 0;
   color: var(--color-text-muted);
-  font-family: var(--font-display);
+  font-family: var(--font-mono);
   font-size: var(--step--1);
   white-space: nowrap;
 }
@@ -533,50 +654,45 @@ a.tag:hover {
   }
 }
 
-/* Hero (home page) - a faint blueprint grid nods to infra diagrams
-   without competing with the content. */
+/* Hero (home page) - an asymmetric composition: the statement runs full
+   width, the lede and CTA sit offset in the right column, leaving
+   deliberate empty space on the left rather than a centred stack. */
 .hero {
-  position: relative;
   padding-block: var(--space-7) var(--space-6);
-  overflow: hidden;
 }
 
-.hero::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background-image:
-    linear-gradient(var(--color-border) 1px, transparent 1px),
-    linear-gradient(90deg, var(--color-border) 1px, transparent 1px);
-  background-size: 2.5rem 2.5rem;
-  background-position: center top;
-  -webkit-mask-image: linear-gradient(to bottom, black, transparent 85%);
-  mask-image: linear-gradient(to bottom, black, transparent 85%);
+.hero__body {
+  display: grid;
+  gap: var(--space-4);
 }
 
-.hero > .container {
-  position: relative;
+@media (min-width: 56rem) {
+  .hero__body {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .hero__title {
+    grid-column: 1 / 3;
+  }
+
+  .hero__meta {
+    grid-column: 2 / 3;
+  }
 }
 
 .hero__title {
-  margin: 0 0 var(--space-3);
+  margin: 0;
+  font-size: var(--step-5);
 }
 
 .lede {
   font-size: var(--step-1);
   color: var(--color-text-muted);
-  max-width: 40rem;
-}
-
-.hero__actions {
-  display: flex;
-  gap: var(--space-3);
-  margin-top: var(--space-4);
-  flex-wrap: wrap;
+  max-width: 32rem;
+  margin: 0;
 }
 
 .hero__image {
-  border-radius: var(--radius);
   margin-top: var(--space-4);
   max-width: 12rem;
 }
@@ -590,16 +706,6 @@ a.tag:hover {
   flex-wrap: wrap;
 }
 
-@media (max-width: 30rem) {
-  .cv-timeline {
-    padding-left: var(--space-4);
-  }
-
-  .cv-entry::before {
-    left: calc(-1 * var(--space-4) - 5px);
-  }
-
-  .hero::before {
-    background-size: 1.5rem 1.5rem;
-  }
+.cta {
+  border-top: var(--border-width) solid var(--color-line);
 }

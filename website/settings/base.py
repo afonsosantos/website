@@ -18,7 +18,6 @@ env = environ.Env()
 
 INSTALLED_APPS = [
     "home",
-    "search",
     "base",
     "about",
     "projects",
@@ -166,7 +165,7 @@ DATA_UPLOAD_MAX_NUMBER_FIELDS = 10_000
 
 # Wagtail settings
 
-WAGTAIL_SITE_NAME = env.str("WAGTAIL_SITE_NAME", default="website")
+WAGTAIL_SITE_NAME = env.str("WAGTAIL_SITE_NAME", default="Afonso Santos")
 
 # Search
 # https://docs.wagtail.org/en/stable/topics/search/backends.html

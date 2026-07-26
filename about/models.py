@@ -24,11 +24,21 @@ class AboutPage(Page):
         verbose_name="Resume (PDF)",
         help_text="Upload a downloadable PDF version of your resume.",
     )
+    resume_pdf_pt = models.ForeignKey(
+        "wagtaildocs.Document",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="+",
+        verbose_name="Resume (PDF, Português)",
+        help_text="Optional. If provided, a second download link is shown alongside the English resume.",
+    )
 
     content_panels = Page.content_panels + [
         FieldPanel("intro"),
         FieldPanel("profile_image"),
         FieldPanel("resume_pdf"),
+        FieldPanel("resume_pdf_pt"),
         InlinePanel("work_experiences", label="Work experience"),
         InlinePanel("education_entries", label="Education"),
         InlinePanel("certificates", label="Certificates"),
@@ -54,7 +64,9 @@ class AboutPage(Page):
 
 
 class WorkExperience(Orderable):
-    page = ParentalKey(AboutPage, on_delete=models.CASCADE, related_name="work_experiences")
+    page = ParentalKey(
+        AboutPage, on_delete=models.CASCADE, related_name="work_experiences"
+    )
     job_title = models.CharField(max_length=255)
     organization = models.CharField(max_length=255)
     organization_url = models.URLField(blank=True)
@@ -96,7 +108,9 @@ class WorkExperience(Orderable):
 
 
 class EducationEntry(Orderable):
-    page = ParentalKey(AboutPage, on_delete=models.CASCADE, related_name="education_entries")
+    page = ParentalKey(
+        AboutPage, on_delete=models.CASCADE, related_name="education_entries"
+    )
     qualification = models.CharField(max_length=255)
     institution = models.CharField(max_length=255)
     institution_url = models.URLField(blank=True)

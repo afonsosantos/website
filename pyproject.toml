@@ -35,7 +35,6 @@ ignore = ["E501"]
 known-first-party = [
     "website",
     "home",
-    "search",
     "base",
     "about",
     "projects",

@@ -4,14 +4,14 @@
 {% block body_class %}template-blogindex{% endblock %}
 
 {% block content %}
-    <section class="container container--narrow">
+    <section class="container container--medium">
         <p class="eyebrow">Writing</p>
         <h1>{{ page.title }}</h1>
         {% if page.intro %}<p class="lede">{{ page.intro }}</p>{% endif %}
     </section>
 
     {% if all_categories %}
-        <section class="container">
+        <section class="container container--medium">
             <ul class="tag-list" aria-label="Filter by category">
                 <li>
                     <a class="tag" href="{% pageurl page %}"{% if not current_category %} aria-current="true"{% endif %}>All</a>
@@ -25,29 +25,24 @@
         </section>
     {% endif %}
 
-    <section class="container">
-        <div class="card-grid">
+    <section class="container container--medium">
+        <div class="index-list">
             {% for post in posts %}
-                <article class="card">
-                    {% if post.cover_image %}
-                        {% image post.cover_image fill-640x360 class="card__image" alt="" %}
-                    {% else %}
-                        <div class="card__image card__image--placeholder" aria-hidden="true"><span>{{ post.title|slice:":1" }}</span></div>
-                    {% endif %}
-                    <div class="card__body">
-                        <p class="card__meta">{{ post.date|date:"j F Y" }}</p>
-                        <h2 class="card__title"><a href="{% pageurl post %}">{{ post.title }}</a></h2>
-                        <p class="card__summary">{{ post.intro }}</p>
+                <article class="index-row">
+                    <p class="index-row__index">{{ forloop.counter|stringformat:"02d" }}</p>
+                    <h2 class="index-row__title"><a href="{% pageurl post %}">{{ post.title }}</a></h2>
+                    <p class="index-row__summary">{{ post.intro }}</p>
+                    <p class="index-row__meta">
+                        <span>{{ post.date|date:"j F Y" }}</span>
                         {% with tags=post.tags.all %}
                             {% if tags %}
-                                <ul class="tag-list">
-                                    {% for tag in tags %}
-                                        <li class="tag">{{ tag.name }}</li>
-                                    {% endfor %}
-                                </ul>
+                                {% for tag in tags %}<span>{{ tag.name }}</span>{% endfor %}
                             {% endif %}
                         {% endwith %}
-                    </div>
+                    </p>
+                    {% if post.cover_image %}
+                        {% image post.cover_image fill-440x330 class="index-row__thumb" alt="" %}
+                    {% endif %}
                 </article>
             {% empty %}
                 <p>No posts published yet.</p>

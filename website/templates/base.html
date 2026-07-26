@@ -50,40 +50,39 @@
 
         <a class="skip-link" href="#main-content">Skip to main content</a>
 
-        <header class="site-header">
-            <div class="site-header__inner">
-                {% wagtail_site as current_site %}
-                <a class="site-header__brand" href="/">{% firstof current_site.site_name "Home" %}</a>
-                {% primary_nav %}
-            </div>
-        </header>
+        <div class="frame">
+            {% wagtail_site as current_site %}
+            {% primary_nav %}
 
-        <main id="main-content">
-            {% block content %}{% endblock %}
-        </main>
+            <div class="content-column">
+                <main id="main-content">
+                    {% block content %}{% endblock %}
+                </main>
 
-        <footer class="site-footer">
-            <div class="site-footer__inner">
-                <div class="richtext">
-                    {% if settings.base.SiteSettings.footer_text %}
-                        {{ settings.base.SiteSettings.footer_text|richtext }}
-                    {% else %}
-                        <p>&copy; {% now "Y" %} {{ current_site.site_name }}</p>
-                    {% endif %}
-                </div>
-                <ul class="social-links">
-                    {% if settings.base.SiteSettings.github_url %}
-                        <li><a href="{{ settings.base.SiteSettings.github_url }}">GitHub</a></li>
-                    {% endif %}
-                    {% if settings.base.SiteSettings.linkedin_url %}
-                        <li><a href="{{ settings.base.SiteSettings.linkedin_url }}">LinkedIn</a></li>
-                    {% endif %}
-                    {% if settings.base.SiteSettings.mastodon_url %}
-                        <li><a href="{{ settings.base.SiteSettings.mastodon_url }}" rel="me">Mastodon</a></li>
-                    {% endif %}
-                </ul>
+                <footer class="site-footer">
+                    <div class="site-footer__inner">
+                        <div class="richtext">
+                            {% if settings.base.SiteSettings.footer_text %}
+                                {{ settings.base.SiteSettings.footer_text|richtext }}
+                            {% else %}
+                                <p>&copy; {% now "Y" %} {{ current_site.site_name }}</p>
+                            {% endif %}
+                        </div>
+                        <ul class="social-links">
+                            {% if settings.base.SiteSettings.github_url %}
+                                <li><a href="{{ settings.base.SiteSettings.github_url }}">GitHub</a></li>
+                            {% endif %}
+                            {% if settings.base.SiteSettings.linkedin_url %}
+                                <li><a href="{{ settings.base.SiteSettings.linkedin_url }}">LinkedIn</a></li>
+                            {% endif %}
+                            {% if settings.base.SiteSettings.mastodon_url %}
+                                <li><a href="{{ settings.base.SiteSettings.mastodon_url }}" rel="me">Mastodon</a></li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                </footer>
             </div>
-        </footer>
+        </div>
 
         {% block extra_js %}
         {# Override this in templates to add extra javascript #}

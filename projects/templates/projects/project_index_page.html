@@ -4,34 +4,31 @@
 {% block body_class %}template-projectindex{% endblock %}
 
 {% block content %}
-    <section class="container container--narrow">
+    <section class="container container--medium">
         <p class="eyebrow">Portfolio</p>
         <h1>{{ page.title }}</h1>
         {% if page.intro %}<p class="lede">{{ page.intro }}</p>{% endif %}
     </section>
 
-    <section class="container">
-        <div class="card-grid">
+    <section class="container container--medium">
+        <div class="index-list">
             {% for project in projects %}
-                <article class="card">
+                <article class="index-row">
+                    <p class="index-row__index">{{ forloop.counter|stringformat:"02d" }}</p>
+                    <h2 class="index-row__title"><a href="{% pageurl project %}">{{ project.title }}</a></h2>
+                    <p class="index-row__summary">{{ project.summary }}</p>
+                    {% with technologies=project.technologies.all %}
+                        {% if technologies %}
+                            <ul class="tag-list index-row__meta">
+                                {% for tech in technologies %}
+                                    <li class="tag">{{ tech.name }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                    {% endwith %}
                     {% if project.cover_image %}
-                        {% image project.cover_image fill-640x360 class="card__image" alt="" %}
-                    {% else %}
-                        <div class="card__image card__image--placeholder" aria-hidden="true"><span>{{ project.title|slice:":1" }}</span></div>
+                        {% image project.cover_image fill-440x330 class="index-row__thumb" alt="" %}
                     {% endif %}
-                    <div class="card__body">
-                        <h2 class="card__title"><a href="{% pageurl project %}">{{ project.title }}</a></h2>
-                        <p class="card__summary">{{ project.summary }}</p>
-                        {% with technologies=project.technologies.all %}
-                            {% if technologies %}
-                                <ul class="tag-list">
-                                    {% for tech in technologies %}
-                                        <li class="tag">{{ tech.name }}</li>
-                                    {% endfor %}
-                                </ul>
-                            {% endif %}
-                        {% endwith %}
-                    </div>
                 </article>
             {% empty %}
                 <p>No projects published yet.</p>
