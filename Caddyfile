@@ -1,9 +1,22 @@
-{$DOMAIN} {
-	# Caddy handles TLS automatically (Let's Encrypt) as long as DOMAIN
-	# resolves to this VM's public IP and ports 80/443 are reachable.
+:80 {
+	# Plain HTTP, no automatic TLS. This VM sits behind an external reverse
+	# proxy (CloudPanel) that terminates TLS and forwards to this VM's
+	# port 80 - the VM itself is on a private IP, so it can't receive the
+	# Let's Encrypt ACME challenge directly. If you ever point DNS straight
+	# at this VM's own public IP instead, switch back to `{$DOMAIN} { ... }`
+	# so Caddy issues its own certificate.
+
+	# Uploaded images/documents live in the media_data volume, mounted
+	# read-only here too (see docker-compose.prod.yml) - Caddy serves
+	# these directly rather than proxying to Django. Static files (CSS/JS/
+	# fonts) are handled below by WhiteNoise inside the web container, but
+	# MEDIA_URL is deliberately not routed by Django's urls.py outside of
+	# DEBUG - only the DEBUG dev server is meant to serve media from disk.
+	handle_path /media/* {
+		root * /srv/media
+		file_server
+	}
+
 	reverse_proxy web:8000
 	encode gzip
-
-	# Static/media are served by WhiteNoise/gunicorn in the web container -
-	# no extra config needed here, just proxy everything through.
 }

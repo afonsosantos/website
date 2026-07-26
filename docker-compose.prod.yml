@@ -32,6 +32,13 @@ services:
       WAGTAILADMIN_BASE_URL: ${WAGTAILADMIN_BASE_URL}
       EMAIL_URL: ${EMAIL_URL}
       DEFAULT_FROM_EMAIL: ${DEFAULT_FROM_EMAIL}
+      # Defaults to true (redirect HTTP -> HTTPS). Set to false in
+      # .env.prod when this VM sits behind another reverse proxy that
+      # already terminates TLS and forwards plain HTTP here (e.g.
+      # CloudPanel) - Caddy's own X-Forwarded-Proto reflects its own
+      # (non-TLS) connection to this container, not the original client's,
+      # so Django would otherwise redirect-loop.
+      SECURE_SSL_REDIRECT: ${SECURE_SSL_REDIRECT:-true}
     volumes:
       # Named volume, not a bind mount: uploaded images/documents persist
       # across `docker compose up --build` and container recreation, live
@@ -50,14 +57,21 @@ services:
     image: caddy:2-alpine
     restart: unless-stopped
     ports:
-      - "80:80"
-      - "443:443"
+      # Host port 8080, not 80: rootless Docker can't bind privileged
+      # ports (<1024) without extra host configuration. If Docker here
+      # isn't rootless, or you've configured
+      # net.ipv4.ip_unprivileged_port_start, change this back to "80:80"
+      # (and add "443:443" if Caddy is doing its own TLS - see Caddyfile).
+      - "8080:80"
     environment:
       DOMAIN: ${DOMAIN}
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy_data:/data
       - caddy_config:/config
+      # Same volume as web's /app/media, mounted read-only - Caddy serves
+      # /media/* directly from here instead of proxying to Django.
+      - media_data:/srv/media:ro
     depends_on:
       - web
 
