@@ -1,13 +1,13 @@
-{% load static wagtailcore_tags wagtailimages_tags wagtailuserbar navigation_tags %}<!DOCTYPE html>
+{% load static wagtailcore_tags wagtailimages_tags wagtailuserbar navigation_tags seo_tags %}<!DOCTYPE html>
 <html lang="en">
     <head>
         <meta charset="utf-8" />
+        {% wagtail_site as current_site %}
         <title>
             {% block title %}
             {% if page.seo_title %}{{ page.seo_title }}{% else %}{{ page.title }}{% endif %}
             {% endblock %}
             {% block title_suffix %}
-            {% wagtail_site as current_site %}
             {% if current_site and current_site.site_name %}- {{ current_site.site_name }}{% endif %}
             {% endblock %}
         </title>
@@ -15,19 +15,26 @@
         <meta name="description" content="{{ page.search_description }}" />
         {% endif %}
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="canonical" href="{{ request.scheme }}://{{ request.get_host }}{{ request.path }}" />
+        <link rel="icon" type="image/svg+xml" href="{% static 'images/favicon.svg' %}" />
 
         {# Open Graph / Twitter Card #}
         <meta property="og:type" content="{% block og_type %}website{% endblock %}" />
         <meta property="og:title" content="{% if page.seo_title %}{{ page.seo_title }}{% else %}{{ page.title }}{% endif %}" />
         {% if page.search_description %}<meta property="og:description" content="{{ page.search_description }}" />{% endif %}
         <meta property="og:url" content="{{ request.build_absolute_uri }}" />
+        {% if current_site and current_site.site_name %}<meta property="og:site_name" content="{{ current_site.site_name }}" />{% endif %}
         {% block og_image %}
         {% if settings.base.SiteSettings.default_og_image %}
             {% image settings.base.SiteSettings.default_og_image width-1200 as og_image %}
             <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ og_image.url }}" />
+            <meta name="twitter:image" content="{{ request.scheme }}://{{ request.get_host }}{{ og_image.url }}" />
         {% endif %}
         {% endblock %}
         <meta name="twitter:card" content="summary_large_image" />
+
+        {# schema.org Person - ties this site to its owner for search engines #}
+        <script type="application/ld+json">{% person_structured_data settings.base.SiteSettings current_site.site_name request %}</script>
 
         {# Force all links in the live preview panel to be opened in a new tab #}
         {% if request.in_preview_panel %}

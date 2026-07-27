@@ -6,6 +6,32 @@
 	# at this VM's own public IP instead, switch back to `{$DOMAIN} { ... }`
 	# so Caddy issues its own certificate.
 
+	# Security response headers, set here rather than in Django: this is
+	# the single hop that's guaranteed to be the last one before the
+	# client on both deployment modes (direct-public-IP and
+	# reverse-proxy-fronted), so it doesn't depend on Django correctly
+	# detecting HTTPS via X-Forwarded-Proto (which the reverse-proxy-fronted
+	# mode can't rely on - see SECURE_SSL_REDIRECT below). `header` replaces
+	# rather than appends, so these values win even if an upstream proxy
+	# (e.g. CloudPanel) also sets its own copy of the same header name -
+	# though if CloudPanel is adding its *own* security headers on top,
+	# disable that in its vhost config instead, since two different values
+	# for the same header (e.g. X-Frame-Options: SAMEORIGIN from CloudPanel
+	# vs DENY from Django below) will otherwise both reach the client.
+	header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+	header Cross-Origin-Resource-Policy "same-origin"
+
+	# CSP/Permissions-Policy only apply outside /admin/: the Wagtail admin
+	# (and its front-end "userbar" overlay shown to logged-in editors on
+	# public pages) relies on inline styles/scripts that a strict policy
+	# would break, and there's no nonce plumbing in this app to relax that
+	# safely just for the admin.
+	@notadmin not path /admin/*
+	header @notadmin {
+		Content-Security-Policy "default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self'; font-src 'self'; frame-src https:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
+		Permissions-Policy "accelerometer=(), autoplay=(), camera=(), display-capture=(), encrypted-media=(), fullscreen=(self), geolocation=(), gyroscope=(), microphone=(), midi=(), payment=(), picture-in-picture=(), publickey-credentials-get=(), usb=()"
+	}
+
 	# Uploaded images/documents live in the media_data volume, mounted
 	# read-only here too (see docker-compose.prod.yml) - Caddy serves
 	# these directly rather than proxying to Django. Static files (CSS/JS/

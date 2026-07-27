@@ -105,6 +105,16 @@ managed Postgres add-on. Since most PaaS containers are ephemeral, set
 media instead of the local filesystem. Run migrations via the platform's
 release/pre-deploy hook rather than at container startup in this case.
 
+### Security headers
+
+`Caddyfile` sets `Strict-Transport-Security`, `Content-Security-Policy`,
+`Permissions-Policy`, and `Cross-Origin-Resource-Policy` on every response
+(the CSP/Permissions-Policy are skipped for `/admin/*` so the Wagtail admin
+still works). `X-Content-Type-Options` and `X-Frame-Options` come from
+Django itself. If you put another reverse proxy in front of Caddy, disable
+that proxy's own default security headers for this site - otherwise the
+client can end up with two conflicting values for the same header.
+
 ### Common to both
 
 Required environment variables (see `.env.example` / `.env.prod.example`):
