@@ -1,3 +1,23 @@
+{
+	# Trust X-Forwarded-* headers from anything connecting via the Docker
+	# bridge network (Docker's default bridge subnets are in this range).
+	# In the reverse-proxy-fronted setup, CloudPanel already sends the
+	# correct `X-Forwarded-Proto: https` - but Docker's port-publishing
+	# NAT makes that connection appear to Caddy as coming from the bridge
+	# gateway IP, not CloudPanel's own address, so without this Caddy
+	# doesn't know to trust it and resets X-Forwarded-Proto to "http"
+	# (since Caddy's own listener below is plain HTTP). That in turn made
+	# Django's `request.is_secure()` always false, breaking HSTS and
+	# producing http:// canonical/og:url/JSON-LD URLs even though every
+	# real visitor is on https. This is safe: an external client hitting
+	# the published port directly still shows up as its own real IP
+	# (Docker only rewrites the source for loopback-originated traffic),
+	# so it can't spoof its way into this trusted range.
+	servers {
+		trusted_proxies static 172.16.0.0/12
+	}
+}
+
 :80 {
 	# Plain HTTP, no automatic TLS. This VM sits behind an external reverse
 	# proxy (CloudPanel) that terminates TLS and forwards to this VM's
