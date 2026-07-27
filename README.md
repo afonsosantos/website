@@ -107,13 +107,15 @@ release/pre-deploy hook rather than at container startup in this case.
 
 ### Security headers
 
-`Caddyfile` sets `Strict-Transport-Security`, `Content-Security-Policy`,
-`Permissions-Policy`, and `Cross-Origin-Resource-Policy` on every response
-(the CSP/Permissions-Policy are skipped for `/admin/*` so the Wagtail admin
-still works). `X-Content-Type-Options` and `X-Frame-Options` come from
-Django itself. If you put another reverse proxy in front of Caddy, disable
-that proxy's own default security headers for this site - otherwise the
-client can end up with two conflicting values for the same header.
+`Caddyfile` sets `Content-Security-Policy`, `Permissions-Policy`, and
+`Cross-Origin-Resource-Policy` on every response (the CSP/Permissions-Policy
+are skipped for `/admin/*` so the Wagtail admin still works).
+`Strict-Transport-Security`, `X-Content-Type-Options`, and `X-Frame-Options`
+come from Django itself - it already has a proxy-aware HSTS setting
+(`SECURE_HSTS_SECONDS` etc.), so don't duplicate that one in Caddy too. If
+you put another reverse proxy in front of Caddy, disable that proxy's own
+default security headers for this site - otherwise the client can end up
+with two conflicting values for the same header.
 
 ### Common to both
 

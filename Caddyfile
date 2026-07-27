@@ -26,19 +26,21 @@
 	# at this VM's own public IP instead, switch back to `{$DOMAIN} { ... }`
 	# so Caddy issues its own certificate.
 
-	# Security response headers, set here rather than in Django: this is
-	# the single hop that's guaranteed to be the last one before the
-	# client on both deployment modes (direct-public-IP and
-	# reverse-proxy-fronted), so it doesn't depend on Django correctly
-	# detecting HTTPS via X-Forwarded-Proto (which the reverse-proxy-fronted
-	# mode can't rely on - see SECURE_SSL_REDIRECT below). `header` replaces
-	# rather than appends, so these values win even if an upstream proxy
-	# (e.g. CloudPanel) also sets its own copy of the same header name -
-	# though if CloudPanel is adding its *own* security headers on top,
-	# disable that in its vhost config instead, since two different values
-	# for the same header (e.g. X-Frame-Options: SAMEORIGIN from CloudPanel
-	# vs DENY from Django below) will otherwise both reach the client.
-	header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+	# Security response headers that Django has no equivalent setting for.
+	# Strict-Transport-Security is deliberately NOT set here: Django's
+	# SecurityMiddleware already sends it (SECURE_HSTS_SECONDS etc. in
+	# website/settings/production.py), and now that `trusted_proxies`
+	# above makes request.is_secure() correctly return true, that's a
+	# single source of truth - adding Caddy's own copy on top produced
+	# two different Strict-Transport-Security header values on the same
+	# response (each `header` op only replaces headers it explicitly
+	# names, it doesn't touch ones the proxied response already carries
+	# under a different value). If a reverse proxy in front of Caddy
+	# (e.g. CloudPanel) also injects its own default security headers,
+	# turn that off in its vhost config instead - otherwise the client
+	# still sees two values for the same header (observed in practice:
+	# CloudPanel's own X-Frame-Options: SAMEORIGIN alongside Django's
+	# X-Frame-Options: DENY).
 	header Cross-Origin-Resource-Policy "same-origin"
 
 	# CSP/Permissions-Policy only apply outside /admin/: the Wagtail admin
