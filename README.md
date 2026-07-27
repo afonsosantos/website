@@ -85,6 +85,17 @@ To update: `git pull`, then
 To back up: `docker compose -f docker-compose.prod.yml --env-file .env.prod exec db pg_dump -U <POSTGRES_USER> <POSTGRES_DB> > backup.sql`
 (and separately back up the `media_data` volume).
 
+**Behind another reverse proxy (no direct public IP):** if the VM isn't
+itself reachable from the public internet — e.g. it's on a private IP with
+something like CloudPanel or a load balancer in front doing TLS — Caddy
+can't get its own Let's Encrypt certificate. Switch the `Caddyfile`'s first
+line to `:80` (plain HTTP, no domain matching), change `docker-compose.prod.yml`'s
+Caddy port mapping to `"8080:80"` (rootless Docker can't bind port 80
+without extra host config anyway), and set `SECURE_SSL_REDIRECT=false` in
+`.env.prod` (otherwise Django redirect-loops, since Caddy would rewrite
+`X-Forwarded-Proto` based on its own plain-HTTP connection). Point the
+upstream proxy at `<vm-ip>:8080`.
+
 ### PaaS (Render, Fly.io, Railway, ...)
 
 The plain `Dockerfile` (runtime stage) also works standalone against a

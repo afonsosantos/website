@@ -64,10 +64,12 @@ The CV itself is single-language. The only bilingual piece is the resume downloa
 
 Docker is a production-only concern in this repo — local dev runs `manage.py runserver` directly, no containers involved. `Dockerfile` is multi-stage: `builder` (uv-installed prod deps only) → `runtime` (the production image, COPYs the app in, runs `collectstatic` at build time with throwaway env values, then `migrate && gunicorn` at container start).
 
-- `docker-compose.prod.yml` — self-hosted VM deployment (the recommended path for this project): Postgres and uploaded media both live in named Docker volumes on the VM itself (no managed DB, no S3), fronted by Caddy (`Caddyfile`) for automatic HTTPS. Has its own explicit `name: website-prod`.
+- `docker-compose.prod.yml` — self-hosted VM deployment (the recommended path for this project): Postgres and uploaded media both live in named Docker volumes on the VM itself (no managed DB, no S3), fronted by Caddy (`Caddyfile`). Has its own explicit `name: website-prod`.
 - PaaS deployment (Render/Fly/Railway) is also supported by the plain `runtime` stage against a managed Postgres + S3 media — see README for details.
 
 Don't assume one when changing deployment-related code; check which path a change targets.
+
+Caddy defaults to `{$DOMAIN}` for automatic Let's Encrypt HTTPS, which needs the VM directly reachable on 80/443 from the public internet. If the VM instead sits behind another reverse proxy that already terminates TLS (this repo's own deployment is set up this way, behind CloudPanel) — the Caddyfile switches to `:80` plain HTTP, the Caddy port mapping in `docker-compose.prod.yml` becomes `8080:80` instead of `80:80` (rootless Docker installs can't bind ports below 1024 without extra host config), and `.env.prod` needs `SECURE_SSL_REDIRECT=false` (otherwise Django redirect-loops, since Caddy rewrites `X-Forwarded-Proto` to reflect its own non-TLS connection to the upstream proxy, not the original client's). Also note: Django's `urls.py` only serves `MEDIA_URL` when `DEBUG=True` — in production, Caddy serves `/media/*` directly from the same `media_data` volume (mounted read-only into the `caddy` service too), not Django/WhiteNoise.
 
 ### Design system
 
