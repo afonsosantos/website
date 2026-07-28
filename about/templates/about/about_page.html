@@ -6,7 +6,7 @@
 {% block content %}
     <section class="container container--medium about-header">
         {% if page.profile_image %}
-            {% image page.profile_image fill-320x320 class="about-header__image" alt=page.profile_image.title %}
+            {% picture page.profile_image fill-320x320 format-{avif,webp,jpeg} class="about-header__image" alt=page.profile_image.title %}
         {% endif %}
         <div>
             <h1>{{ page.title }}</h1>
@@ -17,18 +17,63 @@
                 <div class="button-row">
                     {% if page.resume_pdf %}
                         <a class="button" href="{{ page.resume_pdf.url }}">
-                            Resume (EN{% if page.resume_pdf.file_size %}, {{ page.resume_pdf.file_size|filesizeformat }}{% endif %})
+                            Resume (EN)
                         </a>
                     {% endif %}
                     {% if page.resume_pdf_pt %}
                         <a class="button{% if page.resume_pdf %} button--outline{% endif %}" href="{{ page.resume_pdf_pt.url }}">
-                            Resume (PT{% if page.resume_pdf_pt.file_size %}, {{ page.resume_pdf_pt.file_size|filesizeformat }}{% endif %})
+                            Resume (PT)
                         </a>
                     {% endif %}
                 </div>
             {% endif %}
         </div>
     </section>
+
+    {% with gallery=page.gallery_images.all %}
+        {% if gallery %}
+            <section class="container container--medium">
+                <div class="gallery" data-gallery>
+                    <div class="gallery__track" data-gallery-track>
+                        {% for item in gallery %}
+                            <figure class="gallery__item">
+                                <button
+                                    type="button"
+                                    class="gallery__trigger"
+                                    data-gallery-open
+                                    aria-label="{{ item.alt_text|default:"Open photo" }}"
+                                >
+                                    {% picture item.image fill-480x360 format-{avif,webp,jpeg} class="gallery__thumb" alt="" loading="lazy" %}
+                                </button>
+                                {% if item.caption %}<figcaption>{{ item.caption }}</figcaption>{% endif %}
+                            </figure>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="gallery__controls">
+                    <button type="button" class="gallery__nav" data-gallery-prev aria-label="Scroll gallery back">&larr;</button>
+                    <button type="button" class="gallery__nav" data-gallery-next aria-label="Scroll gallery forward">&rarr;</button>
+                </div>
+            </section>
+
+            <dialog class="lightbox" data-lightbox aria-label="Photo viewer">
+                <div class="lightbox__bar">
+                    <p class="lightbox__count" data-lightbox-count></p>
+                    <button type="button" class="lightbox__close" data-lightbox-close aria-label="Close">&times;</button>
+                </div>
+                <div class="lightbox__stage">
+                    <button type="button" class="lightbox__nav lightbox__nav--prev" data-lightbox-prev aria-label="Previous photo">&larr;</button>
+                    {% for item in gallery %}
+                        <figure class="lightbox__slide" data-lightbox-slide{% if not forloop.first %} hidden{% endif %}>
+                            {% picture item.image width-1600 format-{avif,webp,jpeg} alt=item.alt_text %}
+                            {% if item.caption %}<figcaption>{{ item.caption }}</figcaption>{% endif %}
+                        </figure>
+                    {% endfor %}
+                    <button type="button" class="lightbox__nav lightbox__nav--next" data-lightbox-next aria-label="Next photo">&rarr;</button>
+                </div>
+            </dialog>
+        {% endif %}
+    {% endwith %}
 
     {% with experiences=page.work_experiences.all %}
         {% if experiences %}

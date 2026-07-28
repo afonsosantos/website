@@ -33,7 +33,7 @@
             </header>
 
             {% if page.cover_image %}
-                {% image page.cover_image width-1000 class="stream-image" alt="" %}
+                {% picture page.cover_image width-1000 format-{avif,webp,jpeg} class="stream-image" alt="" %}
             {% endif %}
 
             <div class="stack">

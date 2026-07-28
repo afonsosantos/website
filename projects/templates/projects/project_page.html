@@ -43,7 +43,7 @@
             </header>
 
             {% if page.cover_image %}
-                {% image page.cover_image width-1000 class="stream-image" alt="" %}
+                {% picture page.cover_image width-1000 format-{avif,webp,jpeg} class="stream-image" alt="" %}
             {% endif %}
 
             <div class="stack">
@@ -57,7 +57,7 @@
                     <div class="card-grid">
                         {% for item in gallery %}
                             <figure class="stream-image">
-                                {% image item.image width-600 alt=item.alt_text %}
+                                {% picture item.image width-600 format-{avif,webp,jpeg} alt=item.alt_text loading="lazy" %}
                                 {% if item.caption %}<figcaption>{{ item.caption }}</figcaption>{% endif %}
                             </figure>
                         {% endfor %}

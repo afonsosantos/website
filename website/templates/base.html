@@ -47,6 +47,14 @@
         <link rel="stylesheet" type="text/css" href="{% static 'css/components.css' %}">
         <link rel="stylesheet" type="text/css" href="{% static 'css/code.css' %}">
 
+        {% comment %}
+        Not deferred/async on purpose: it applies a stored dark/light
+        preference to <html data-theme> before first paint, avoiding a
+        flash of the wrong theme. See the theme-toggle button in
+        primary_nav.html for the other half of this.
+        {% endcomment %}
+        <script src="{% static 'js/website.js' %}"></script>
+
         {% block extra_css %}
         {# Override this in templates to add extra stylesheets #}
         {% endblock %}

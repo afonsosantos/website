@@ -15,7 +15,7 @@
                     <p class="index-row__summary">{{ post.intro }}</p>
                     <p class="index-row__meta">{{ post.date|date:"j F Y" }}</p>
                     {% if post.cover_image %}
-                        {% image post.cover_image fill-440x330 class="index-row__thumb" alt="" %}
+                        {% picture post.cover_image fill-440x330 format-{avif,webp,jpeg} class="index-row__thumb" alt="" loading="lazy" %}
                     {% endif %}
                 </article>
             {% empty %}

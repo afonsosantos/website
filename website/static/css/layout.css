@@ -4,6 +4,18 @@
   box-sizing: border-box;
 }
 
+/* The {% picture %} tag wraps every <img> in a <picture> for AVIF/WebP
+   sources. Left alone, that extra box becomes the actual flex/grid item
+   in layouts built around sizing the <img> directly (e.g. flex-shrink: 0
+   on .about-header__image) - the unstyled <picture> shrinks instead,
+   squishing the image inside it. display: contents removes <picture>'s
+   own box from layout entirely so the <img> participates directly, same
+   as before every image went through this tag. Doesn't affect the
+   browser's source-selection behavior, only how it's laid out. */
+picture {
+  display: contents;
+}
+
 html {
   color-scheme: light dark;
   scroll-padding-top: 2rem;
@@ -308,6 +320,10 @@ summary:focus-visible,
 .spine__nav-list a:hover,
 .spine__nav-list a[aria-current="page"] {
   color: var(--color-accent);
+}
+
+.theme-toggle {
+  margin-top: var(--space-4);
 }
 
 @media (min-width: 64rem) {

@@ -36,6 +36,7 @@ class AboutPage(Page):
 
     content_panels = Page.content_panels + [
         FieldPanel("intro"),
+        InlinePanel("gallery_images", label="Gallery images"),
         FieldPanel("profile_image"),
         FieldPanel("resume_pdf"),
         FieldPanel("resume_pdf_pt"),
@@ -189,3 +190,24 @@ class Skill(Orderable):
 
     def get_category_display_name(self):
         return dict(self.CATEGORY_CHOICES).get(self.category, self.category)
+
+
+class AboutPageGalleryImage(Orderable):
+    page = ParentalKey(AboutPage, on_delete=models.CASCADE, related_name="gallery_images")
+    image = models.ForeignKey(
+        "wagtailimages.Image", on_delete=models.CASCADE, related_name="+"
+    )
+    caption = models.CharField(max_length=255, blank=True)
+    alt_text = models.CharField(
+        max_length=255,
+        help_text="Describe the image for screen reader users.",
+    )
+
+    panels = [
+        FieldPanel("image"),
+        FieldPanel("caption"),
+        FieldPanel("alt_text"),
+    ]
+
+    class Meta(Orderable.Meta):
+        verbose_name = "Gallery image"

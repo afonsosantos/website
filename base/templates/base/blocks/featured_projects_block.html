@@ -23,7 +23,7 @@
                         {% endif %}
                     {% endwith %}
                     {% if project.cover_image %}
-                        {% image project.cover_image fill-440x330 class="index-row__thumb" alt="" %}
+                        {% picture project.cover_image fill-440x330 format-{avif,webp,jpeg} class="index-row__thumb" alt="" loading="lazy" %}
                     {% endif %}
                 </article>
             {% empty %}

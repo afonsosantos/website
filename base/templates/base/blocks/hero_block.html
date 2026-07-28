@@ -9,7 +9,7 @@
                     <p class="lede">{{ value.subheading }}</p>
                 {% endif %}
                 {% if value.image %}
-                    {% image value.image width-1000 class="hero__image" alt=value.image_alt_text %}
+                    {% picture value.image width-1000 format-{avif,webp,jpeg} class="hero__image" alt=value.image_alt_text %}
                 {% endif %}
                 {% if value.button %}
                     <div class="button-row">
