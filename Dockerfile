@@ -103,4 +103,13 @@ RUN SECRET_KEY=collectstatic-build-time-only \
 #   PRACTICE. The database should be migrated manually or using the release
 #   phase facilities of your hosting platform. This is used only so the
 #   Wagtail instance can be started with a simple "docker run" command.
-CMD set -xe; python manage.py migrate --noinput; gunicorn website.wsgi:application
+#
+# Without --workers, gunicorn defaults to a single sync worker - every
+# request (including the Wagtail admin's own autosave, which fires on a
+# 500ms debounce while editing, and its live-preview re-render) is handled
+# one at a time, so they queue up behind each other instead of running
+# concurrently. gthread workers share memory across their threads (unlike
+# separate sync worker processes), which matters on a small VM: 2 workers
+# x 4 threads gives real concurrency for these I/O-bound admin requests
+# without multiplying the app's memory footprint by 8.
+CMD set -xe; python manage.py migrate --noinput; gunicorn website.wsgi:application --workers 2 --threads 4 --worker-class gthread
