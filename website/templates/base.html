@@ -103,7 +103,16 @@
         {# Override this in templates to add extra javascript #}
         {% endblock %}
 
+        {% comment %}
+        Wagtail admin's own UI never renders this template - it has its own
+        base.html - but the live-preview panel (/admin/pages/<id>/edit/preview/)
+        does render the real page through this one, inside an iframe. Without
+        this check, every keystroke-triggered preview refresh would fire a
+        pageview at Simple Analytics.
+        {% endcomment %}
+        {% if request.path|slice:":7" != "/admin/" %}
         <script async src="https://scripts.simpleanalyticscdn.com/latest.js"></script>
         <noscript><img src="https://queue.simpleanalyticscdn.com/noscript.gif" alt="" referrerpolicy="no-referrer-when-downgrade"/></noscript>
+        {% endif %}
     </body>
 </html>
