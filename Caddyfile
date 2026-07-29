@@ -51,12 +51,14 @@
 	@notadmin not path /admin/*
 	header @notadmin {
 		# script-src/img-src/connect-src each carry an extra host for Simple
-		# Analytics (scripts.simpleanalyticscdn.com serves the script itself;
-		# queue.simpleanalyticscdn.com is both the noscript <img> beacon and
-		# the fetch() the script makes to record a pageview - without
-		# connect-src explicitly listing it, that fetch would fall back to
-		# default-src 'self' and get silently blocked).
-		Content-Security-Policy "default-src 'self'; img-src 'self' data: https://queue.simpleanalyticscdn.com; style-src 'self' 'unsafe-inline'; script-src 'self' https://scripts.simpleanalyticscdn.com; font-src 'self'; connect-src 'self' https://queue.simpleanalyticscdn.com; frame-src https:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
+		# Analytics: scripts.simpleanalyticscdn.com serves the script itself
+		# (script-src) *and* needs connect-src too, since browser devtools
+		# fetch its latest.js.map source map as a "connect" request, not a
+		# script load - CSP doesn't treat that fetch as covered by script-src.
+		# queue.simpleanalyticscdn.com is both the noscript <img> beacon
+		# (img-src) and the fetch() the script makes to record a pageview
+		# (connect-src) - neither falls back to default-src 'self' on its own.
+		Content-Security-Policy "default-src 'self'; img-src 'self' data: https://queue.simpleanalyticscdn.com; style-src 'self' 'unsafe-inline'; script-src 'self' https://scripts.simpleanalyticscdn.com; font-src 'self'; connect-src 'self' https://queue.simpleanalyticscdn.com https://scripts.simpleanalyticscdn.com; frame-src https:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
 		Permissions-Policy "accelerometer=(), autoplay=(), camera=(), display-capture=(), encrypted-media=(), fullscreen=(self), geolocation=(), gyroscope=(), microphone=(), midi=(), payment=(), picture-in-picture=(), publickey-credentials-get=(), usb=()"
 	}
 
