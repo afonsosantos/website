@@ -50,7 +50,13 @@
 	# safely just for the admin.
 	@notadmin not path /admin/*
 	header @notadmin {
-		Content-Security-Policy "default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self'; font-src 'self'; frame-src https:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
+		# script-src/img-src/connect-src each carry an extra host for Simple
+		# Analytics (scripts.simpleanalyticscdn.com serves the script itself;
+		# queue.simpleanalyticscdn.com is both the noscript <img> beacon and
+		# the fetch() the script makes to record a pageview - without
+		# connect-src explicitly listing it, that fetch would fall back to
+		# default-src 'self' and get silently blocked).
+		Content-Security-Policy "default-src 'self'; img-src 'self' data: https://queue.simpleanalyticscdn.com; style-src 'self' 'unsafe-inline'; script-src 'self' https://scripts.simpleanalyticscdn.com; font-src 'self'; connect-src 'self' https://queue.simpleanalyticscdn.com; frame-src https:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
 		Permissions-Policy "accelerometer=(), autoplay=(), camera=(), display-capture=(), encrypted-media=(), fullscreen=(self), geolocation=(), gyroscope=(), microphone=(), midi=(), payment=(), picture-in-picture=(), publickey-credentials-get=(), usb=()"
 	}
 
