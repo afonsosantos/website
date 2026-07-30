@@ -1,0 +1,77 @@
+{% extends "wagtailadmin/generic/base.html" %}
+{% load static %}
+
+{% block extra_css %}
+    {{ block.super }}
+    <style>
+        #cover-generator-app {
+            max-width: 60rem;
+        }
+        #cover-generator-app p.help {
+            color: #666;
+            margin: 0 0 1.5rem;
+        }
+        #cover-generator-app .field-row {
+            margin-bottom: 1rem;
+        }
+        #cover-generator-app label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+        }
+        #cover-generator-app input[type="text"] {
+            width: 100%;
+            max-width: 40rem;
+            padding: 0.5rem 0.6rem;
+            border: 1px solid #ccc;
+            font-size: 0.95rem;
+        }
+        #cover-generator-app .buttons {
+            display: flex;
+            gap: 0.6rem;
+            margin: 1.25rem 0;
+        }
+        #cover-generator-app .canvas-frame {
+            border: 1px solid #ccc;
+            line-height: 0;
+            max-width: 48rem;
+        }
+        #cover-generator-app canvas {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+    </style>
+{% endblock %}
+
+{% block main_content %}
+    <div id="cover-generator-app" data-font-url="{% static 'fonts/ClashDisplay-Bold.woff2' %}">
+        <p class="help">
+            Generates an on-brand cover image (gradient background + title, using the site's own colors and Clash Display) for a blog post or project.
+            Exports at 1600&times;900 as WebP - Wagtail's image filters will crop it as needed for the index thumbnail and the post header when you upload it as the page's cover image.
+        </p>
+
+        <div class="field-row">
+            <label for="cover-generator-eyebrow">Eyebrow / category (optional)</label>
+            <input type="text" id="cover-generator-eyebrow" placeholder="e.g. DevOps, Conference, Kubernetes" />
+        </div>
+        <div class="field-row">
+            <label for="cover-generator-title">Post title</label>
+            <input type="text" id="cover-generator-title" placeholder="e.g. EuroPython 2026: Kraków, DevOps tracks, and 25 years of the conference" />
+        </div>
+
+        <div class="buttons">
+            <button type="button" id="cover-generator-regenerate" class="button button-secondary">Regenerate layout</button>
+            <button type="button" id="cover-generator-download" class="button">Download WebP</button>
+        </div>
+
+        <div class="canvas-frame">
+            <canvas id="cover-generator-canvas" width="1600" height="900"></canvas>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+    {{ block.super }}
+    <script src="{% static 'js/cover-generator.js' %}"></script>
+{% endblock %}

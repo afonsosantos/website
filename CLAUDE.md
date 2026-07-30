@@ -44,6 +44,8 @@ Site: http://localhost:8000 · Admin: http://localhost:8000/admin/ · Emails pri
 
 `base/blocks.py` defines the blocks reused across apps: `BodyStreamBlock` (heading, richtext, image, quote, embed, code) is used by both `blog.BlogPage.body` and `projects.ProjectPage.body`, and `HomeStreamBlock` (hero, featured_projects, latest_posts, CTA) drives `home.HomePage.sections`. When adding a block type meant to appear in more than one page's StreamField, put it in `base/blocks.py`, not in the app that happens to need it first. `base` also holds `SiteSettings` (`base/models.py`, footer text, social links, default OG image) and the `primary_nav` template tag (`base/templatetags/navigation_tags.py`).
 
+`base/wagtail_hooks.py` registers a custom admin-only tool, "Cover generator" (`base/views.py`'s `CoverGeneratorView`, template at `base/templates/base/admin/cover_generator.html`, extending `wagtailadmin/generic/base.html` so it gets the normal admin chrome/theme for free) — a canvas-based generator that draws a gradient-background cover image with the post title in Clash Display, matching the site's own design tokens, and exports it as WebP (`website/static/js/cover-generator.js`). It's registered like any other Wagtail admin extension (`register_admin_urls` + `register_admin_menu_item` hooks), not routed through the public-facing URLs.
+
 Changing `base/blocks.py` changes the migration state of every app whose StreamField uses those blocks (see `blog/migrations/0002_alter_blogpage_body.py` / `projects/migrations/0002_alter_projectpage_body.py` for the precedent) — run `makemigrations` for all affected apps together, not just the one you were editing.
 
 ### CV/portfolio data model: Orderable + InlinePanel, not StreamField
