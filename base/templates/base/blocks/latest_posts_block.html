@@ -14,9 +14,6 @@
                     <h3 class="index-row__title"><a href="{% pageurl post %}">{{ post.title }}</a></h3>
                     <p class="index-row__summary">{{ post.intro }}</p>
                     <p class="index-row__meta">{{ post.date|date:"j F Y" }}</p>
-                    {% if post.cover_image %}
-                        {% picture post.cover_image fill-440x330 format-{avif,webp,jpeg} class="index-row__thumb" alt="" loading="lazy" %}
-                    {% endif %}
                 </article>
             {% empty %}
                 <p>No posts yet.</p>

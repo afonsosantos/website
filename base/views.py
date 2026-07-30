@@ -10,6 +10,10 @@ class CoverGeneratorView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        # wagtailadmin/generic/base.html's <title> tag reads header_title,
+        # while the on-page header (no breadcrumbs here) reads page_title -
+        # two different context variables for what looks like one setting.
         context["page_title"] = "Cover generator"
+        context["header_title"] = "Cover generator"
         context["header_icon"] = "image"
         return context
