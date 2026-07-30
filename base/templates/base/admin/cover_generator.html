@@ -7,10 +7,6 @@
         #cover-generator-app {
             max-width: 60rem;
         }
-        #cover-generator-app p.help {
-            color: #666;
-            margin: 0 0 1.5rem;
-        }
         #cover-generator-app .field-row {
             margin-bottom: 1rem;
         }
@@ -46,11 +42,6 @@
 
 {% block main_content %}
     <div id="cover-generator-app" data-font-url="{% static 'fonts/ClashDisplay-Bold.woff2' %}">
-        <p class="help">
-            Generates an on-brand cover image (gradient background + title, using the site's own colors and Clash Display) for a blog post or project.
-            Exports at 1600&times;900 as WebP - Wagtail's image filters will crop it as needed for the index thumbnail and the post header when you upload it as the page's cover image.
-        </p>
-
         <div class="field-row">
             <label for="cover-generator-eyebrow">Eyebrow / category (optional)</label>
             <input type="text" id="cover-generator-eyebrow" placeholder="e.g. DevOps, Conference, Kubernetes" />

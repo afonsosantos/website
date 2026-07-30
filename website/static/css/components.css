@@ -331,6 +331,15 @@
   font-size: var(--step--1);
 }
 
+/* .stream-image is used two ways: as a <figure> wrapping an <img> (project
+   gallery items), and directly as the class on the <img> itself (cover
+   images on blog/project pages, since Wagtail's {% picture %} tag puts the
+   class straight on the fallback <img>, not the <picture> wrapper). The
+   "img" descendant selector alone only ever matched the first case - in
+   the second, nothing set height, so a generic max-width:100% elsewhere
+   shrank the width while the HTML height attribute stayed fixed, visibly
+   squishing the image. */
+.stream-image,
 .stream-image img {
   width: 100%;
   height: auto;

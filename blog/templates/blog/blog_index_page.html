@@ -40,9 +40,6 @@
                             {% endif %}
                         {% endwith %}
                     </p>
-                    {% if post.cover_image %}
-                        {% picture post.cover_image fill-440x330 format-{avif,webp,jpeg} class="index-row__thumb" alt="" loading="lazy" %}
-                    {% endif %}
                 </article>
             {% empty %}
                 <p>No posts published yet.</p>
