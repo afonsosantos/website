@@ -7,7 +7,9 @@ register = template.Library()
 
 # Same escaping Django's own `json_script` filter applies, so the JSON blob
 # can't be broken out of by a `</script>` (or similar) sequence in a value.
-_JSON_SCRIPT_ESCAPES = (("<", "\\u003c"), (">", "\\u003e"), ("&", "\\u0026"))
+_JSON_SCRIPT_ESCAPES = str.maketrans(
+    {"<": "\\u003c", ">": "\\u003e", "&": "\\u0026"}
+)
 
 
 @register.simple_tag
@@ -37,7 +39,5 @@ def person_structured_data(site_settings, site_name, request):
     if same_as:
         data["sameAs"] = same_as
 
-    json_str = json.dumps(data)
-    for unsafe, safe in _JSON_SCRIPT_ESCAPES:
-        json_str = json_str.replace(unsafe, safe)
+    json_str = json.dumps(data).translate(_JSON_SCRIPT_ESCAPES)
     return mark_safe(json_str)
